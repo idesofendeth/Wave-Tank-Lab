@@ -7,20 +7,63 @@ close all
 % albin stored each video as a series of images 
 % in a .mat file. Each mat file is a struct, which contains cells
 % each position in the cell relates to a frame in the video
-%
+%constants
+scale=3.004*10^-4; %scaling factor
 %% testing ideas
-A=load('ImageDataAlbin\Images_Droplet_1cm.mat');
+I = load( sprintf('Images_Marble_%dcm.mat',6) ).I; 
+%I = load( sprintf('Images_MarbleADJUSTED_%dcm.mat',NR) ).I; 
+%I = load( sprintf('Images_Droplet_%dcm.mat',NR) ).I; 
 
-image=A.I; %load cell from the mat file
-image1=cell2mat(image(150)); %choose a frame, convert to matrix
-%figure(1) %display
-%imshow(image1,[]);
-[nx ny]=size(cell2mat(image(1)));
+
+% Create an averaged image-------------------------------------------------
+%Iavg = AverageImageFunc(I(1:15)); %works for marble 10cm,
+Iavg = AverageImageFunc(I(:));%works for marble depth 1cm, 6cm
+%Iavg = AverageImageFunc(I(185:200));%works for marble depth 1cm, 6cm
+%Iavg=AverageImageFunc(I(45:end));
+%Threshold level for binarizing--------------------------------------------
+%thres = 18; %for droplet with depth 6cm
+%thres = 23; %for marble with depth 1cm
+thres = 25; %for marble with depth 6cm
+
+
+%Remove background, adjust contrast, threshold, edge-detection-------------
+I2 = cell(1,height(I));
+for i = 1:height(I)
+    %Remove background from images-----------------------------------------
+    I2{i} = imsubtract(I{i},Iavg) ;
+
+    %Adjust image contrast-------------------------------------------------
+    I3{i} = imadjust(I2{i});
+
+    %Filter image----------------------------------------------------------
+    I3{i} = imdiffusefilt(I3{i});
+   
+    % %Threshold image-------------------------------------------------------
+    I3{i} = I3{i} > thres;
+
+    %Clean up image--------------------------------------------------------
+    I3{i} = bwareaopen(I3{i},50) ;
+    I3{i} = imclearborder(I3{i});
+    %edgesmoothing
+    % windowSize = 51;
+    % kernel = ones(windowSize) / windowSize ^ 2;
+    % blurryImage = conv2(single(I3{i}), kernel, 'same');
+    % I3{i} = blurryImage > thres; % Rethreshold
+
+end
+%%
+% A=load('ImageDataAlbin\Images_Droplet_6cm.mat');
+% 
+ image=I3; %load cell from the mat file
+% image1=cell2mat(image(150)); %choose a frame, convert to matrix
+% %figure(1) %display
+% %imshow(image1,[]);
+[nx ny]=size(I3{1});
 
 %using a loop to reshape the data from the image files into a
 %data matrix to be able to use SVD(POD)
 datamatrix=[];
-for ii=1:length(image)
+for ii=90:140%length(image)
     image1=cell2mat(image(ii));
     image1=reshape(image1,[],1);
     datamatrix=[datamatrix image1];
@@ -133,7 +176,7 @@ imshow(image1,[])
 
 %% lets try DMD
 
-r=100;
+r=50;
 X1=datamatrix(:,1:end-1);
 X2=datamatrix(:,2:end);
 % Reduce rank
@@ -270,11 +313,253 @@ set(h,'LineStyle','none');
 subplot(2,1,2)
 contourf(real(test))
 
-test=reshape(Phi(:,6),[nx nx]);
+test=reshape(Phi(:,10),[nx nx]);
 figure(19)
 subplot(2,1,1)
 %image1=cell2mat(image(150));
-h=surf(imag(test));
+h=surf(real(test));
 set(h,'LineStyle','none');
 subplot(2,1,2)
-contourf(imag(test))
+contourf(real(test))
+
+test=reshape(Phi(:,15),[nx nx]);
+figure(20)
+subplot(2,1,1)
+%image1=cell2mat(image(150));
+h=surf(real(test));
+set(h,'LineStyle','none');
+subplot(2,1,2)
+contourf(real(test))
+
+test=reshape(Phi(:,20),[nx nx]);
+figure(21)
+subplot(2,1,1)
+%image1=cell2mat(image(150));
+h=surf(real(test));
+set(h,'LineStyle','none');
+subplot(2,1,2)
+contourf(real(test))
+
+test=reshape(Phi(:,25),[nx nx]);
+figure(22)
+subplot(2,1,1)
+%image1=cell2mat(image(150));
+h=surf(real(test));
+set(h,'LineStyle','none');
+subplot(2,1,2)
+contourf(real(test))
+
+test=reshape(Phi(:,30),[nx nx]);
+figure(23)
+subplot(2,1,1)
+%image1=cell2mat(image(150));
+h=surf(real(test));
+set(h,'LineStyle','none');
+subplot(2,1,2)
+contourf(real(test))
+%% analysis test
+%mode3
+peaks = imregionalmax(real(reshape(Phi(:,3),[nx nx])));
+
+testpeaks=reshape(Phi(:,3),[nx nx]);
+figure;
+subplot(2,1,1)
+%image1=cell2mat(image(150));
+h=surf(real(testpeaks));
+set(h,'LineStyle','none');
+subplot(2,1,2)
+contourf(real(testpeaks))
+
+[TF,Prom] = islocalmax(real(testpeaks));
+
+figure;
+contourf(Prom)
+
+
+%mode4
+peaks = imregionalmax(real(reshape(Phi(:,4),[nx nx])));
+
+testpeaks=reshape(Phi(:,4),[nx nx]);
+figure;
+subplot(2,1,1)
+%image1=cell2mat(image(150));
+h=surf(real(testpeaks));
+set(h,'LineStyle','none');
+subplot(2,1,2)
+contourf(real(testpeaks))
+
+[TF,Prom] = islocalmax(real(testpeaks));
+
+figure;
+contourf(Prom)
+
+
+%mode5
+peaks = imregionalmax(real(reshape(Phi(:,5),[nx nx])));
+
+testpeaks=reshape(Phi(:,5),[nx nx]);
+figure;
+subplot(2,1,1)
+%image1=cell2mat(image(150));
+h=surf(real(testpeaks));
+set(h,'LineStyle','none');
+subplot(2,1,2)
+contourf(real(testpeaks))
+
+[TF,Prom] = islocalmax(real(testpeaks));
+
+figure;
+contourf(Prom)
+
+
+%mode6
+peaks = imregionalmax(real(reshape(Phi(:,6),[nx nx])));
+
+testpeaks=reshape(Phi(:,6),[nx nx]);
+figure;
+subplot(2,1,1)
+%image1=cell2mat(image(150));
+h=surf(real(testpeaks));
+set(h,'LineStyle','none');
+subplot(2,1,2)
+contourf(real(testpeaks))
+
+[TF,Prom] = islocalmax(real(testpeaks));
+
+figure;
+contourf(Prom)
+
+%mode7
+peaks = imregionalmax(real(reshape(Phi(:,7),[nx nx])));
+
+testpeaks=reshape(Phi(:,7),[nx nx]);
+figure;
+subplot(2,1,1)
+%image1=cell2mat(image(150));
+h=surf(real(testpeaks));
+set(h,'LineStyle','none');
+subplot(2,1,2)
+contourf(real(testpeaks))
+
+[TF,Prom] = islocalmax(real(testpeaks));
+
+figure;
+contourf(Prom)
+
+%mode15
+peaks = imregionalmax(real(reshape(Phi(:,15),[nx nx])));
+
+testpeaks=reshape(Phi(:,15),[nx nx]);
+figure;
+subplot(2,1,1)
+%image1=cell2mat(image(150));
+h=surf(real(testpeaks));
+set(h,'LineStyle','none');
+subplot(2,1,2)
+contourf(real(testpeaks))
+
+[TF,Prom] = islocalmax(real(testpeaks));
+
+figure;
+contourf(Prom)
+
+
+%%
+yCentroid=486;
+xCentroid=nx/2;
+boundaries = bwboundaries(Prom);
+x = boundaries{1}(:, 2);
+y = boundaries{1}(:, 1);
+distances = sqrt((x-xCentroid).^2 + (y-yCentroid).^2);
+
+%% frame 1
+imdex1=90;
+image1=cell2mat(image(imdex1));
+imagehalf=image1(:,446:end);
+imageflip=flipdim(imagehalf,2);
+mirror=horzcat(imageflip,imagehalf);
+figure;
+imshow(I{imdex1},[])
+figure;
+imshow(mirror,[])
+
+[B,L,N,A] = bwboundaries(mirror);
+innerdistvec=[];
+outerdistvec=[];
+minrad=150;
+hold on
+for k = 1:length(B)
+   boundary = B{k};
+   if(k>N)
+        plot(boundary(:,2), boundary(:,1), 'g','LineWidth',2);
+        innerdistances = mean(sqrt((boundary(:,2)-xCentroid).^2 + (boundary(:,1)-yCentroid).^2));
+        if innerdistances>=minrad
+            innerdistvec=[innerdistvec innerdistances];
+        end
+   else
+        plot(boundary(:,2), boundary(:,1), 'r','LineWidth',2);
+        outerdistances = mean(sqrt((boundary(:,2)-xCentroid).^2 + (boundary(:,1)-yCentroid).^2));
+        if outerdistances>=minrad
+            outerdistvec=[outerdistvec outerdistances];
+            
+        end
+   end
+    
+end
+sortouterdist=sort(outerdistvec)
+outerdiff=(diff(sortouterdist))*scale*10^2
+%outerdiff=outerdiff>10^-3
+
+sortinnerdist=sort(innerdistvec)
+innerdiff=(diff(sortinnerdist))*scale*10^2
+%innerdiff=innerdiff>10^-3
+avginner1=mean(innerdiff)
+avgouter1=mean(outerdiff)
+
+cp=sqrt(9.81/avginner)
+
+%% frame 2
+imdex2=imdex1+1;
+image1=cell2mat(image(imdex2));
+imagehalf=image1(:,446:end);
+imageflip=flipdim(imagehalf,2);
+mirror=horzcat(imageflip,imagehalf);
+figure;
+imshow(I{imdex2},[])
+figure;
+imshow(mirror,[])
+
+[B,L,N,A] = bwboundaries(mirror);
+innerdistvec=[];
+outerdistvec=[];
+minrad=150;
+hold on
+for k = 1:length(B)
+   boundary = B{k};
+   if(k>N)
+        plot(boundary(:,2), boundary(:,1), 'g','LineWidth',2);
+        innerdistances = mean(sqrt((boundary(:,2)-xCentroid).^2 + (boundary(:,1)-yCentroid).^2));
+        if innerdistances>=minrad
+            innerdistvec=[innerdistvec innerdistances];
+        end
+   else
+        plot(boundary(:,2), boundary(:,1), 'r','LineWidth',2);
+        outerdistances = mean(sqrt((boundary(:,2)-xCentroid).^2 + (boundary(:,1)-yCentroid).^2));
+        if outerdistances>=minrad
+            outerdistvec=[outerdistvec outerdistances];
+            
+        end
+   end
+    
+end
+sortouterdist=sort(outerdistvec)
+outerdiff=(diff(sortouterdist))*scale*10^2
+%outerdiff=outerdiff>10^-3
+
+sortinnerdist=sort(innerdistvec)
+innerdiff=(diff(sortinnerdist))*scale*10^2
+%innerdiff=innerdiff>10^-3
+avginner2=mean(innerdiff)
+avgouter2=mean(outerdiff)
+%%
+phase=(avginner2-avginner1)/dt
