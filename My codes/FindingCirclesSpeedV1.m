@@ -68,7 +68,7 @@ end
 yCentroid=486;
 xCentroid=nx/2;
 % range taken from albins code. before 90 there is too much noise
-imstart=95;
+imstart=90;
 imend=140;
 avginner1vec=[];
 avginner2vec=[];
@@ -77,7 +77,6 @@ avgouter2vec=[];
 phasevec=[];
 diffvec1=[];
 diffvec2=[];
-lambdavec=[];
 %% loop
 for j=imstart:imend
 % frame 1
@@ -91,42 +90,34 @@ mirror=horzcat(imageflip,imagehalf);
 [B,L,N,A] = bwboundaries(mirror);
 innerdistvec1=[];
 outerdistvec1=[];
-innerdistances1=0;
-outerdistances1=0;
-minrad=100;
-% figure;
-% imshow(mirror,[])
-crestPositionvec1=[];
+minrad=150;
 hold on
 for k = 1:length(B)
    boundary = B{k};
    if(k>N)
-        %plot(boundary(:,2), boundary(:,1), 'g','LineWidth',2);
+        plot(boundary(:,2), boundary(:,1), 'g','LineWidth',2);
         innerdistances1 = mean(sqrt((boundary(:,2)-xCentroid).^2 + (boundary(:,1)-yCentroid).^2));
-        
-   else
-       % plot(boundary(:,2), boundary(:,1), 'r','LineWidth',2);
-        outerdistances1 = mean(sqrt((boundary(:,2)-xCentroid).^2 + (boundary(:,1)-yCentroid).^2));
-      
-   end
-
-   if innerdistances1>=minrad && outerdistances1>=minrad
-            outerdistve1c=[outerdistvec1 outerdistances1];
+        if innerdistances1>=minrad
             innerdistvec1=[innerdistvec1 innerdistances1];
-            crestPosition1=abs(outerdistances1+innerdistances1)/2;
-            crestPositionvec1=[crestPositionvec1 crestPosition1];
+        end
+   else
+        plot(boundary(:,2), boundary(:,1), 'r','LineWidth',2);
+        outerdistances1 = mean(sqrt((boundary(:,2)-xCentroid).^2 + (boundary(:,1)-yCentroid).^2));
+        if outerdistances1>=minrad
+            outerdistve1c=[outerdistvec1 outerdistances1];
+            
+        end
    end
     
 end
-
 sortouterdist1=sort(outerdistvec1);
-outerdiff1=(diff(sortouterdist1));
+outerdiff1=(diff(sortouterdist1))*scale*10^2;
 %outerdiff=outerdiff>10^-3
 
 sortinnerdist1=sort(innerdistvec1);
-innerdiff1=(diff(sortinnerdist1));
+innerdiff1=(diff(sortinnerdist1))*scale*10^2;
 %innerdiff=innerdiff>10^-3
-avginner1=mean(sortinnerdist1);
+avginner1=mean(innerdiff1);
 avgouter1=mean(outerdiff1);
 
 avginner1vec=[avginner1vec avginner1];
@@ -142,72 +133,57 @@ mirror=horzcat(imageflip,imagehalf);
 [B,L,N,A] = bwboundaries(mirror);
 innerdistvec2=[];
 outerdistvec2=[];
-crestPositionvec2=[];
-innerdistances2=0;
-outerdistances2=0;
+minrad=150;
 hold on
 for k = 1:length(B)
    boundary = B{k};
    if(k>N)
-       % plot(boundary(:,2), boundary(:,1), 'g','LineWidth',2);
+        plot(boundary(:,2), boundary(:,1), 'g','LineWidth',2);
         innerdistances2 = mean(sqrt((boundary(:,2)-xCentroid).^2 + (boundary(:,1)-yCentroid).^2));
-       
-   else
-       % plot(boundary(:,2), boundary(:,1), 'r','LineWidth',2);
-        outerdistances2 = mean(sqrt((boundary(:,2)-xCentroid).^2 + (boundary(:,1)-yCentroid).^2));
-        
-   end
-    if innerdistances2>=minrad && outerdistances2>=minrad
-            outerdistvec2=[outerdistvec2 outerdistances2];
+        if innerdistances2>=minrad
             innerdistvec2=[innerdistvec2 innerdistances2];
-            crestPosition2=abs(outerdistances2+innerdistances2)/2;
-            crestPositionvec2=[crestPositionvec2 crestPosition2];
+        end
+   else
+        plot(boundary(:,2), boundary(:,1), 'r','LineWidth',2);
+        outerdistances2 = mean(sqrt((boundary(:,2)-xCentroid).^2 + (boundary(:,1)-yCentroid).^2));
+        if outerdistances2>=minrad
+            outerdistvec2=[outerdistvec2 outerdistances2];
+            
+        end
    end
     
 end
-
-
 sortouterdist2=sort(outerdistvec2);
-outerdiff2=(diff(sortouterdist2));
+outerdiff2=(diff(sortouterdist2))*scale*10^2;
 %outerdiff=outerdiff>10^-3
 
 sortinnerdist2=sort(innerdistvec2);
-innerdiff2=(diff(sortinnerdist2));
+innerdiff2=(diff(sortinnerdist2))*scale*10^2;
 %innerdiff=innerdiff>10^-3
-avginner2=mean(sortinnerdist2);
+avginner2=mean(innerdiff2);
 avginner2vec=[avginner2vec avginner2];
 avgouter2=mean(outerdiff2);
 avgouter2vec=[avgouter2vec avgouter2];
 %
 %phase=abs((avginner2-avginner1))/2*dt;
 
-avgphase=abs(avginner2-avginner1)/dt;
-ldex=min(length(crestPositionvec2),length(crestPositionvec1));
 
-% ldex=min(length(innerdistvec1),length(innerdistvec2));
-for ii=1:ldex
-    crestphase=abs(crestPositionvec2(ii)-crestPositionvec1(ii))/dt;
+ldex=min(length(innerdistvec1),length(innerdistvec2));
+for ii=1:ldex-1
+    phase=abs(innerdistvec2(ii)-innerdistvec1(ii));
+    phasevec=[phasevec phase];
     
-    phasevec=[phasevec crestphase];
-    lamda=abs(diff(crestPositionvec1(ii)));
-    lambdavec=[lambdavec lamda];
 end
-% indiff2=abs(diff(sortinnerdist2(1:ldex)));
-% indiff1=abs(diff(sortinnerdist1(1:ldex)));
-% diffvec1=[diffvec1 indiff1];
-% diffvec2=[diffvec2 indiff2];
+indiff2=abs(diff(innerdistvec2(1:ldex)));
+indiff1=abs(diff(innerdistvec1(1:ldex)));
+diffvec1=[diffvec1 indiff1];
+diffvec2=[diffvec2 indiff2];
 
-%phasevec=[phasevec; crestphase];
 end
-lambdavec=lambdavec*scale*10^2;
-phasevec=phasevec*scale*10^2;;
 %%
-avglambda=abs(avginner2vec-avginner1vec)*scale*10^2;
-sortp=sort(phasevec);
+sortp=sort(phasevec)/dt*scale*100;
 revp=flip(sortp);
-sortdiffmean=sort(mean([diffvec1' diffvec2'],2)/2);
-sortdiff1=sort(lambdavec);
-sortdiff2=sort(diffvec2);
+sortdiff=sort(diffvec1);%sort(mean([diffvec1' diffvec2'],2));
 % figure;
 % plot(sortdiff,revp)
 % xlim([0 20])
@@ -231,13 +207,9 @@ c_grav = sqrt( ( g* lambda /(2* pi) ) .*tanh( 2*pi* H./lambda ) );
 
 figure(1);
 % plot(lambda,c,lambda,c_cap,'-.',lambda,c_grav,'-.','LineWidth',1)
-
-plot(lambda*100,c*100,lambda*100,c_cap*100,'-.',lambda*100,c_grav*100,'-.','LineWidth',1.5)
 hold on
-%plot(sortdiffmean,revp,'b-*')
-% plot(sortdiff1,revp,'-*')
-% plot(sortdiff2,revp,'-*')
-plot(lambda(1:length(phasevec))*100,flip(sort(phasevec)),'o')
+plot(lambda*100,c*100,lambda*100,c_cap*100,'-.',lambda*100,c_grav*100,'-.','LineWidth',1.5)
+plot(sortdiff,revp,'-*')
 hold off
 
 
@@ -245,11 +217,11 @@ hold off
 ylabel('$c$ [cm/s]','Interpreter','latex')
 xlabel('$\lambda$ [cm]','Interpreter','latex')
 
-legend('$c$','$c_{capillary}$','$c_{gravity}$','diff1','diff2','Interpreter','latex')
+legend('$c$','$c_{capillary}$','$c_{gravity}$','ExpData','Interpreter','latex')
 %     ylim([0 100])
-%     xlim([0 6])
+     xlim([0 6])
         ylim([0 100])
-    xlim([0 20])
+    %xlim([0 6])
 % disp('Shallow water approx, kH<<1, leads to tanh(kH)~kH')
 % disp('Deep water approx, kH>>1, leads to tanh(kH)~1')
 % %Deep water surface waves ( kH>>1 )
@@ -258,8 +230,8 @@ legend('$c$','$c_{capillary}$','$c_{gravity}$','diff1','diff2','Interpreter','la
 % %Shallow water surface waves ( kH<<1 )
 % c_cap_shallow = 2* pi./lambda .*sqrt( sigma.*H/ rho); %Pure capillary wave (dispersive)
 % c_grav_shallow = sqrt(g* H); % Pure gravity wave (non dispersive)
-lambda_min = 2*pi*sqrt(sigma/(rho*g))*10^2;
-lambda_cap = sqrt(sigma/(rho*g))*10^2;
+lambda_min = 2*pi*sqrt(sigma/(rho*g))*10^2
+lambda_cap = sqrt(sigma/(rho*g))*10^2
 %2*pi*sqrt(lambda_)
 
 

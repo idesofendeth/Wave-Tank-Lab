@@ -473,7 +473,7 @@ y = boundaries{1}(:, 1);
 distances = sqrt((x-xCentroid).^2 + (y-yCentroid).^2);
 
 %% frame 1
-imdex1=90;
+imdex1=100;
 image1=cell2mat(image(imdex1));
 imagehalf=image1(:,446:end);
 imageflip=flipdim(imagehalf,2);
@@ -516,7 +516,7 @@ innerdiff=(diff(sortinnerdist))*scale*10^2
 avginner1=mean(innerdiff)
 avgouter1=mean(outerdiff)
 
-cp=sqrt(9.81/avginner)
+
 
 %% frame 2
 imdex2=imdex1+1;
