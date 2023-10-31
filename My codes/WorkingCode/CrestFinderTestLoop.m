@@ -55,8 +55,8 @@ for i = 1:height(I)
 end
 %% loop
 
-imstart=95;
-imend=140;
+imstart=60;
+imend=190;
 size=[(abs(imstart-imend)) length(I)];
 phasevec=[];
 lamdavec=[];
@@ -77,14 +77,15 @@ mirror=horzcat(imageflip,imagehalf);
 % figure;
 % imshow(I{imdex1},[])
 % figure;
-% imshow(mirror,[])
+ %imshow(mirror,[])
 %radiusRange=[50 300]
 % finding the center of the image
 %[centers, radii1, metric1] = imfindcircles(mirror,radiusRange,'ObjectPolarity','bright','EdgeThreshold',0.4)
 %viscircles(centers, radii1,'EdgeColor','b');
 minradius=150;
 
-[Crest1,lamda1, innerdistvec1,outerdistvec1] = CrestFinder(mirror,centers,minradius)
+[Crest1,lamda1, innerdistvec1,outerdistvec1] = CrestFinder(mirror,centers,minradius);
+drawnow
 
 
 % frame 2
@@ -103,7 +104,7 @@ mirror=horzcat(imageflip,imagehalf);
 %viscircles(centers, radii1,'EdgeColor','b');
 minradius=150;
 
-[Crest2,lamda2, innerdistvec2,outerdistvec2] = CrestFinder(mirror,centers,minradius)
+[Crest2,lamda2, innerdistvec2,outerdistvec2] = CrestFinder(mirror,centers,minradius);
 
 
 
@@ -168,10 +169,9 @@ ylabel('$c$ [cm/s]','Interpreter','latex')
 xlabel('$\lambda$ [cm]','Interpreter','latex')
 
 legend('$c$','$c_{capillary}$','$c_{gravity}$','diff1','diff2','Interpreter','latex')
-%     ylim([0 100])
-%     xlim([0 6])
-        ylim([0 100])
-    xlim([0 20])
+
+    ylim([0 100])
+    xlim([0 10])
 % disp('Shallow water approx, kH<<1, leads to tanh(kH)~kH')
 % disp('Deep water approx, kH>>1, leads to tanh(kH)~1')
 % %Deep water surface waves ( kH>>1 )
