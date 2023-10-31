@@ -7,9 +7,6 @@ close all
 % albin stored each video as a series of images
 % in a .mat file. Each mat file is a struct, which contains cells
 % each position in the cell relates to a frame in the video
-% IMPORTANT NOTE: THE CM for droplet and marble refer to the DEPTH! Albin
-% had a constant marble size of 1.6cm and unknown droplet size
-% 3cm depth droplet seems to have issues, will check later
 
 %% constants
 scale=3.004*10^-4; %scaling factor
@@ -17,9 +14,9 @@ dt=1/300; %framerate time delta
 centers=[446.497245615476 486.383816964470]; %FOUND FROM PREVIOUS EXPERIMENTATION using findCircles function
 
 %% testing ideas many parts of this starting code are taking from Albins main code file.
-I = load( sprintf('Images_Marble_%dcm.mat',10) ).I;
+I = load( sprintf('Images_Marble_%dcm.mat',1) ).I;
 %I = load( sprintf('Images_MarbleADJUSTED_%dcm.mat',NR) ).I;
-%I = load( sprintf('Images_Droplet_%dcm.mat',3) ).I;
+%I = load( sprintf('Images_Droplet_%dcm.mat',NR) ).I;
 
 
 % Create an averaged image-------------------------------------------------
@@ -30,14 +27,14 @@ I = load( sprintf('Images_Marble_%dcm.mat',10) ).I;
 % furthermore, the following work quite well and give good results when
 % matching the correct average and thresholding for the given dataset.
 % Which is awesome!
-Iavg = AverageImageFunc(I(1:15)); %works for marble 10cm, this works in this code aswell
-%Iavg = AverageImageFunc(I(:));%works for marble depth 1cm, 6cm. Also works for 1cm droplet!
+%Iavg = AverageImageFunc(I(1:15)); %works for marble 10cm, this works in this code aswell
+Iavg = AverageImageFunc(I(:));%works for marble depth 1cm, 6cm
 %Iavg = AverageImageFunc(I(185:200));%works for marble depth 1cm, 6cm
 %Iavg=AverageImageFunc(I(45:end));
 %Threshold level for binarizing--------------------------------------------
 %thres = 18; %for droplet with depth 6cm
-%thres = 23; %for marble with depth 1cm
-thres = 25; %for marble with depth 6cm
+thres = 23; %for marble with depth 1cm
+%thres = 25; %for marble with depth 6cm
 
 
 %Remove background, adjust contrast, threshold, edge-detection-------------
@@ -67,7 +64,7 @@ for i = 1:height(I)
 end
 %% loop
 % indexes for start and end frames, change these as one sees fit
-imstart=30;
+imstart=95;
 imend=190;
 % initializing variables
 size=[(abs(imstart-imend)) length(I)];
@@ -189,8 +186,8 @@ hold off
 ylabel('$c$ [cm/s]','Interpreter','latex')
 xlabel('$\lambda$ [cm]','Interpreter','latex')
 
-legend('$c$','$c_{capillary}$','$c_{gravity}$','data','Interpreter','latex')
-title('Dispersion relation: Theory vs captured data')
+legend('$c$','$c_{capillary}$','$c_{gravity}$',','Interpreter','latex')
+
 ylim([0 100])
 xlim([0 10])
 % disp('Shallow water approx, kH<<1, leads to tanh(kH)~kH')
