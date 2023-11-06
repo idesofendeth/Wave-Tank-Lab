@@ -14,12 +14,13 @@ close all
 %% constants
 scale=3.004*10^-4; %scaling factor
 dt=1/300; %framerate time delta
-centers=[446.497245615476 486.383816964470]; %FOUND FROM PREVIOUS EXPERIMENTATION using findCircles function
-
+%centers=[446.497245615476 486.383816964470]; % For MARBLE FOUND FROM PREVIOUS EXPERIMENTATION using findCircles function
+%centers=[406.0999  501.9339]; %for DROPLET 1cm
+centers=[435.9794  485.6637]; % for DROPLET 6cm
 %% testing ideas many parts of this starting code are taking from Albins main code file.
-I = load( sprintf('Images_Marble_%dcm.mat',10) ).I;
-%I = load( sprintf('Images_MarbleADJUSTED_%dcm.mat',NR) ).I;
-%I = load( sprintf('Images_Droplet_%dcm.mat',3) ).I;
+%I = load( sprintf('Images_Marble_%dcm.mat',1) ).I;
+%I = load( sprintf('Images_MarbleADJUSTED_%dcm.mat',10) ).I;
+I = load( sprintf('Images_Droplet_%dcm.mat',6) ).I;
 
 
 % Create an averaged image-------------------------------------------------
@@ -30,14 +31,14 @@ I = load( sprintf('Images_Marble_%dcm.mat',10) ).I;
 % furthermore, the following work quite well and give good results when
 % matching the correct average and thresholding for the given dataset.
 % Which is awesome!
-Iavg = AverageImageFunc(I(1:15)); %works for marble 10cm, this works in this code aswell
-%Iavg = AverageImageFunc(I(:));%works for marble depth 1cm, 6cm. Also works for 1cm droplet!
+%Iavg = AverageImageFunc(I(1:15)); %works for marble 10cm, this works in this code aswell
+Iavg = AverageImageFunc(I(:));%works for marble depth 1cm, 6cm. Also works for 1cm droplet!
 %Iavg = AverageImageFunc(I(185:200));%works for marble depth 1cm, 6cm
 %Iavg=AverageImageFunc(I(45:end));
 %Threshold level for binarizing--------------------------------------------
-%thres = 18; %for droplet with depth 6cm
+thres = 18; %for droplet with depth 6cm
 %thres = 23; %for marble with depth 1cm
-thres = 25; %for marble with depth 6cm
+%thres = 25; %for marble with depth 6cm
 
 
 %Remove background, adjust contrast, threshold, edge-detection-------------
@@ -65,10 +66,27 @@ for i = 1:height(I)
     % I3{i} = blurryImage > thres; % Rethreshold
 
 end
+
+%% finding centers experimental stuff
+%c=imfindcircles(I3{67},[150 500]);
+%visCircles(centers,250)
+
 %% loop
 % indexes for start and end frames, change these as one sees fit
-imstart=30;
-imend=190;
+
+% for 10cm marble start 30 end 210
+% for 6cm marble start 80 end 285
+% for 1cm marble start 60 end 235
+% for 6cm droplet start 20 end 200
+% for 1cm droplet start 67 end 250
+%halfdex is the vertical position of the line to mirror the image across
+%the position of the circles is different for both marble and droplet
+
+%halfdex=447; %for marble
+%halfdex=402; %for droplet 1cm
+halfdex=436; %for droplet 6cm
+imstart=20;
+imend=200;
 % initializing variables
 size=[(abs(imstart-imend)) length(I)];
 phasevec=[];
@@ -85,17 +103,10 @@ for k=imstart:imend
     image=I3;
     imdex1=k;
     image1=cell2mat(image(imdex1));
-    imagehalf=image1(:,447:end);
+    imagehalf=image1(:,halfdex:end);
     imageflip=flipdim(imagehalf,2);
     mirror=horzcat(imageflip,imagehalf);
-    % figure;
-    % imshow(I{imdex1},[])
-    % figure;
-    %imshow(mirror,[])
-    %radiusRange=[50 300]
-    % finding the center of the image
-    %[centers, radii1, metric1] = imfindcircles(mirror,radiusRange,'ObjectPolarity','bright','EdgeThreshold',0.4)
-    %viscircles(centers, radii1,'EdgeColor','b');
+  
     minradius=150;
 
     [Crest1,lamda1, innerdistvec1,outerdistvec1] = CrestFinder(mirror,centers,minradius);
@@ -105,17 +116,10 @@ for k=imstart:imend
     % frame 2
     imdex1=k+1;
     image1=cell2mat(image(imdex1));
-    imagehalf=image1(:,447:end);
+    imagehalf=image1(:,halfdex:end);
     imageflip=flipdim(imagehalf,2);
     mirror=horzcat(imageflip,imagehalf);
-    % figure;
-    % imshow(I{imdex1},[])
-    % figure;
-    % imshow(mirror,[])
-    %radiusRange=[50 300]
-    % finding the center of the image
-    %[centers, radii1, metric1] = imfindcircles(mirror,radiusRange,'ObjectPolarity','bright','EdgeThreshold',0.4)
-    %viscircles(centers, radii1,'EdgeColor','b');
+    
     minradius=150;
 
     [Crest2,lamda2, innerdistvec2,outerdistvec2] = CrestFinder(mirror,centers,minradius);

@@ -7,16 +7,19 @@ close all
 % albin stored each video as a series of images
 % in a .mat file. Each mat file is a struct, which contains cells
 % each position in the cell relates to a frame in the video
+% IMPORTANT NOTE: THE CM for droplet and marble refer to the DEPTH! Albin
+% had a constant marble size of 1.6cm and unknown droplet size
+% 3cm depth droplet seems to have issues, will check later
 
 %% constants
 scale=3.004*10^-4; %scaling factor
 dt=1/300; %framerate time delta
-centers=[446.497245615476 486.383816964470]; %FOUND FROM PREVIOUS EXPERIMENTATION using findCircles function
-
+%centers=[446.497245615476 486.383816964470]; % For MARBLE FOUND FROM PREVIOUS EXPERIMENTATION using findCircles function
+centers=[406.0999  501.9339]; %for DROPLET
 %% testing ideas many parts of this starting code are taking from Albins main code file.
-I = load( sprintf('Images_Marble_%dcm.mat',1) ).I;
-%I = load( sprintf('Images_MarbleADJUSTED_%dcm.mat',NR) ).I;
-%I = load( sprintf('Images_Droplet_%dcm.mat',NR) ).I;
+%I = load( sprintf('Images_Marble_%dcm.mat',1) ).I;
+%I = load( sprintf('Images_MarbleADJUSTED_%dcm.mat',10) ).I;
+I = load( sprintf('Images_Droplet_%dcm.mat',1) ).I;
 
 
 % Create an averaged image-------------------------------------------------
@@ -28,12 +31,12 @@ I = load( sprintf('Images_Marble_%dcm.mat',1) ).I;
 % matching the correct average and thresholding for the given dataset.
 % Which is awesome!
 %Iavg = AverageImageFunc(I(1:15)); %works for marble 10cm, this works in this code aswell
-Iavg = AverageImageFunc(I(:));%works for marble depth 1cm, 6cm
+Iavg = AverageImageFunc(I(:));%works for marble depth 1cm, 6cm. Also works for 1cm droplet!
 %Iavg = AverageImageFunc(I(185:200));%works for marble depth 1cm, 6cm
 %Iavg=AverageImageFunc(I(45:end));
 %Threshold level for binarizing--------------------------------------------
-%thres = 18; %for droplet with depth 6cm
-thres = 23; %for marble with depth 1cm
+thres = 18; %for droplet with depth 6cm
+%thres = 23; %for marble with depth 1cm
 %thres = 25; %for marble with depth 6cm
 
 
@@ -62,10 +65,21 @@ for i = 1:height(I)
     % I3{i} = blurryImage > thres; % Rethreshold
 
 end
+
+%% finding centers
+%c=imfindcircles(I3{67},[150 500]);
+visCircles(centers,250)
+
 %% loop
 % indexes for start and end frames, change these as one sees fit
-imstart=95;
-imend=190;
+
+% for 10cm marble start 30 end 210
+% for 6cm marble start 80 end 285
+% for 1cm marble start 60 end 235
+% for 6cm droplet start 20 end 200
+% for 1cm droplet start 67 end 250
+imstart=67;
+imend=250;
 % initializing variables
 size=[(abs(imstart-imend)) length(I)];
 phasevec=[];
@@ -85,14 +99,7 @@ for k=imstart:imend
     imagehalf=image1(:,447:end);
     imageflip=flipdim(imagehalf,2);
     mirror=horzcat(imageflip,imagehalf);
-    % figure;
-    % imshow(I{imdex1},[])
-    % figure;
-    %imshow(mirror,[])
-    %radiusRange=[50 300]
-    % finding the center of the image
-    %[centers, radii1, metric1] = imfindcircles(mirror,radiusRange,'ObjectPolarity','bright','EdgeThreshold',0.4)
-    %viscircles(centers, radii1,'EdgeColor','b');
+  
     minradius=150;
 
     [Crest1,lamda1, innerdistvec1,outerdistvec1] = CrestFinder(mirror,centers,minradius);
@@ -105,14 +112,7 @@ for k=imstart:imend
     imagehalf=image1(:,447:end);
     imageflip=flipdim(imagehalf,2);
     mirror=horzcat(imageflip,imagehalf);
-    % figure;
-    % imshow(I{imdex1},[])
-    % figure;
-    % imshow(mirror,[])
-    %radiusRange=[50 300]
-    % finding the center of the image
-    %[centers, radii1, metric1] = imfindcircles(mirror,radiusRange,'ObjectPolarity','bright','EdgeThreshold',0.4)
-    %viscircles(centers, radii1,'EdgeColor','b');
+    
     minradius=150;
 
     [Crest2,lamda2, innerdistvec2,outerdistvec2] = CrestFinder(mirror,centers,minradius);
@@ -186,8 +186,8 @@ hold off
 ylabel('$c$ [cm/s]','Interpreter','latex')
 xlabel('$\lambda$ [cm]','Interpreter','latex')
 
-legend('$c$','$c_{capillary}$','$c_{gravity}$',','Interpreter','latex')
-
+legend('$c$','$c_{capillary}$','$c_{gravity}$','data','Interpreter','latex')
+title('Dispersion relation: Theory vs captured data')
 ylim([0 100])
 xlim([0 10])
 % disp('Shallow water approx, kH<<1, leads to tanh(kH)~kH')
