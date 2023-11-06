@@ -41,18 +41,18 @@ for i = 1:height(I)
 
     %Filter image----------------------------------------------------------
     I3{i} = imdiffusefilt(I3{i});
-   
+    % 
     % %Threshold image-------------------------------------------------------
     I3{i} = I3{i} > thres;
 
     %Clean up image--------------------------------------------------------
     I3{i} = bwareaopen(I3{i},50) ;
     I3{i} = imclearborder(I3{i});
-    %edgesmoothing
-    % windowSize = 51;
-    % kernel = ones(windowSize) / windowSize ^ 2;
-    % blurryImage = conv2(single(I3{i}), kernel, 'same');
-    % I3{i} = blurryImage > thres; % Rethreshold
+    % %edgesmoothing
+    % % windowSize = 51;
+    % % kernel = ones(windowSize) / windowSize ^ 2;
+    % % blurryImage = conv2(single(I3{i}), kernel, 'same');
+    % % I3{i} = blurryImage > thres; % Rethreshold
 
 end
 %%
@@ -268,6 +268,39 @@ axis square;
 % subplot(2,1,2)
 % contourf(real(test))
 %% analysis test
+%mode1
+peaks = imregionalmax(real(reshape(Phi(:,1),[nx nx])));
+
+testpeaks=reshape(Phi(:,1),[nx nx]);
+figure;
+subplot(2,1,1)
+%image1=cell2mat(image(150));
+h=surf(real(testpeaks));
+set(h,'LineStyle','none');
+subplot(2,1,2)
+contourf(real(testpeaks))
+
+[TF,Prom] = islocalmax(real(testpeaks));
+
+figure;
+contourf(Prom)
+%mode2
+peaks = imregionalmax(real(reshape(Phi(:,2),[nx nx])));
+
+testpeaks=reshape(Phi(:,2),[nx nx]);
+figure;
+subplot(2,1,1)
+%image1=cell2mat(image(150));
+h=surf(real(testpeaks));
+set(h,'LineStyle','none');
+subplot(2,1,2)
+contourf(real(testpeaks))
+
+[TF,Prom] = islocalmax(real(testpeaks));
+
+figure;
+contourf(Prom)
+
 %mode3
 peaks = imregionalmax(real(reshape(Phi(:,3),[nx nx])));
 
@@ -356,6 +389,22 @@ contourf(real(testpeaks))
 figure;
 contourf(Prom)
 
+%mode9
+peaks = imregionalmax(real(reshape(Phi(:,9),[nx nx])));
+
+testpeaks=reshape(Phi(:,9),[nx nx]);
+figure;
+subplot(2,1,1)
+%image1=cell2mat(image(150));
+h=surf(real(testpeaks));
+set(h,'LineStyle','none');
+subplot(2,1,2)
+contourf(real(testpeaks))
+
+[TF,Prom] = islocalmax(real(testpeaks));
+
+figure;
+contourf(Prom)
 %mode15
 peaks = imregionalmax(real(reshape(Phi(:,15),[nx nx])));
 
