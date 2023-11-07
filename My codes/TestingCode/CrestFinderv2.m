@@ -45,7 +45,7 @@ for k = 1:N
     % Boundary k is the parent of a hole if the k-th column 
     % of the adjacency matrix A contains a non-zero element. Boundary k is
     % the outer boundary of the circle/crest
-    %if (nnz(A(:,k)) > 0) 
+    if length(B{k})>500
         boundaryP = B{k}; 
         plot(boundaryP(:,2),... 
             boundaryP(:,1),'r','LineWidth',2); 
@@ -56,16 +56,16 @@ for k = 1:N
         end
         % Loop through the children of boundary k, the children of a given
         % boundary of k is the inner boundary of that circle
-        for l = find(A(:,k))' 
-            boundaryC = B{l}; 
-            plot(boundaryC(:,2),... 
-                boundaryC(:,1),'g','LineWidth',2);
-            innerdistances = mean(sqrt((boundaryC(:,2)-xCentroid).^2 + (boundaryC(:,1)-yCentroid).^2)); %This gives the mean inner radius
-        if innerdistances>=minrad
-            innerdistvec=[innerdistvec innerdistances];
-        end
-        end 
-    %end
+        % for l = find(A(:,k))' 
+        %     boundaryC = B{l}; 
+        %     plot(boundaryC(:,2),... 
+        %         boundaryC(:,1),'g','LineWidth',2);
+        %     innerdistances = mean(sqrt((boundaryC(:,2)-xCentroid).^2 + (boundaryC(:,1)-yCentroid).^2)); %This gives the mean inner radius
+        % if innerdistances>=minrad
+        %     innerdistvec=[innerdistvec innerdistances];
+        % end
+        % end 
+    end
     
 
 
@@ -78,14 +78,18 @@ hold off
 % might be able to see a ring with ones eye. Eg, there is a break in the
 % ring or the ring is noisy and the algorithm does not detect inner and
 % outer edges
-if length(outerdistvec)==length(innerdistvec)
-    Crest=abs(outerdistvec+innerdistvec)/2; %averaging between the outer and inner radius to find the "true" crest position, as it should be in the middle of
-    %the outer and inner boudary
-    lamda=abs(diff(Crest)); %finding the reported wavelengths
-else
-    Crest=[];
-    lamda=[];
-end
 
-end
+%outerdistvec=sort(outerdistvec);
+% if length(outerdistvec)==length(innerdistvec)
+%     Crest=abs(outerdistvec+innerdistvec)/2; %averaging between the outer and inner radius to find the "true" crest position, as it should be in the middle of
+%     %the outer and inner boudary
+    Crest=outerdistvec;
+     lamda=abs(diff(Crest)); %finding the reported wavelengths
+     lamda=sort(lamda);
+% else
+    
+   % lamda=[];
+% end
+% 
+% end
 
