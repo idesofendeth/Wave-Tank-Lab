@@ -1,4 +1,4 @@
-function [Crest,lamda,innerdistvec,outerdistvec] = CrestFinder(image,centers,minradius)
+function [Crest,lamda,innerdistvec,outerdistvec] = CrestFinderv2(image,centers,minradius)
 %CRESTFINDER: V1, This function goes through a binarized image and finds
 %the inner and outer borders of the wave crest. With these two positions
 %found a average ring is formed using all position of the inner and outer
@@ -33,7 +33,8 @@ outerdistvec=[];
 % case I am leveraging the algorithms ability to find "holes", which in
 % reality are the inner boundaries found in green. 
 % The issue with the previous algorithm using findCircles was that it could
-% not a
+% not account for concentric circles, and had issues with finding circles
+% that were not perfectly circular.
 BW=image;
 [B,L,N,A] = bwboundaries(BW); 
 imshow(BW); hold on; 
@@ -44,7 +45,7 @@ for k = 1:N
     % Boundary k is the parent of a hole if the k-th column 
     % of the adjacency matrix A contains a non-zero element. Boundary k is
     % the outer boundary of the circle/crest
-    if (nnz(A(:,k)) > 0) 
+    %if (nnz(A(:,k)) > 0) 
         boundaryP = B{k}; 
         plot(boundaryP(:,2),... 
             boundaryP(:,1),'r','LineWidth',2); 
@@ -64,7 +65,7 @@ for k = 1:N
             innerdistvec=[innerdistvec innerdistances];
         end
         end 
-    end
+    %end
     
 
 
