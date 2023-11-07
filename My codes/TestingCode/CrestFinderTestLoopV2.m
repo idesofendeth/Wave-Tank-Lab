@@ -192,7 +192,7 @@ figure(1);
 
 plot(lambda*100,c*100,lambda*100,c_cap*100,'-.',lambda*100,c_grav*100,'-.','LineWidth',1.5)
 hold on
-plot(lamdavec,phasevec(1:length(lamdavec)),'*') %lamda will always have 1 less column, thus one must cut some data from phase vec.
+plot(lamdavec,phasevec(35:end-(88-35)),'*') %lamda will always have 1 less column, thus one must cut some data from phase vec.
 %this might be losing some data, but it works for the most part 
 hold off
 
