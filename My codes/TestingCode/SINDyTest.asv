@@ -70,24 +70,35 @@ end
 %% SINDy
 
 
-polyorder = 1;  % search space up to n-order polynomials
+polyorder = 3;  % search space up to n-order polynomials
 usesine = 1;    % no trig functions
 n=1; %1d
 image=I3{100};
 image=im2double(image);
-rimage=reshape(image,[],1);
-x1=rimage;
-image=I3{101};
-image=im2double(image);
-rimage=reshape(image,[],1);
-x2=rimage;
-dx=diff([x1 x2]);
+imax=
+x1=image(467,486:end)';
+dx=gradient(x1);
+% rimage=reshape(image,[],1);
+% x1=rimage;
+% image=I3{101};
+% image=im2double(image);
+% rimage=reshape(image,[],1);
+% x2=rimage;
+% xmat=[x1 x2];
+% dx=diff(xmat');
+% dx=dx';
 
 %% Build library and compute sparse regression
-Theta = poolData(x,n,polyorder,usesine,0); 
-lambda = 0.1; % lambda is our sparsification knob.
+Theta = poolData(x1,n,polyorder,usesine,0); 
+lambda = 0.02; % lambda is our sparsification knob.
 Xi = sparsifyDynamics(Theta,dx,lambda,n);
 
 Xdrecon=Theta*Xi;
 Xfrecon=cumtrapz(Xdrecon);
-
+%%
+figure;
+hold on
+plot(x1)
+plot(Xfrecon)
+hold off
+legend('data','SINDy')

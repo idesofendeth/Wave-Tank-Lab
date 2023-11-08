@@ -67,40 +67,13 @@ for i = 1:height(I)
 
 end
 
-%% SINDy
-
-
-polyorder = 1;  % search space up to n-order polynomials
-usesine = 1;    % no trig functions
-n=1; %1d
-image=I3{100};
+%% curve fit
+image=I3{125};
 image=im2double(image);
 
-x1=image(467,486:end)';
+x1=image(467,686:end)';
 imax=max(x1);
 x1=x1/imax;
-dx=gradient(x1);
-% rimage=reshape(image,[],1);
-% x1=rimage;
-% image=I3{101};
-% image=im2double(image);
-% rimage=reshape(image,[],1);
-% x2=rimage;
-% xmat=[x1 x2];
-% dx=diff(xmat');
-% dx=dx';
-
-%% Build library and compute sparse regression
-Theta = poolData(x1,n,polyorder,usesine,4); 
-lambda = 0.02; % lambda is our sparsification knob.
-Xi = sparsifyDynamics(Theta,dx,lambda,n);
-
-Xdrecon=Theta*Xi;
-Xfrecon=cumtrapz(Xdrecon);
-%%
-figure;
-hold on
-plot(x1)
-plot(Xfrecon)
-hold off
-legend('data','SINDy')
+L=length(image(467,686:end));
+xgrid=0:1:L-1;
+xgrid=xgrid*scale;
