@@ -1,4 +1,4 @@
-function [fitresult, gof] = createFitSine(xgrid, x1)
+function [fitresult, gof] = createFitSine(xgrid, x1,xstart,xend)
 %CREATEFIT(XGRID,X1)
 %  Create a fit.
 %
@@ -21,7 +21,7 @@ function [fitresult, gof] = createFitSine(xgrid, x1)
 
 % Set up fittype and options.
 ft = fittype( 'sin1' );
-excludedPoints = (xData < 0.005) | (xData > 0.01);
+excludedPoints = (xData < xstart) | (xData > xend);
 opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
 opts.Display = 'Off';
 opts.Lower = [-Inf 0 -Inf];

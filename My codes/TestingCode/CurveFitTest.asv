@@ -76,7 +76,7 @@ imax=max(x1);
 x1=x1/imax;
 L=length(image(467,686:end));
 xgrid=0:1:L-1;
-xgrid=xgrid'*scale;
+xgrid=xgrid*scale;
 xlower=0.005;
 xupper=0.01;
 [fitresult, gof] = createFitSine(xgrid,x1,xlower,xupper);
@@ -89,23 +89,17 @@ lambda=(2*pi)/k; %meters
 
 %% loop time
 xlower=0.005;
-xupper=0.0075;
+xupper=0.01;
 deltar=abs(xlower-xupper);
 lambdavec=[];
 rgrid=xlower:deltar:length(xgrid)*scale;
-tol=10^-2;
-lamdex=[];
 for i=0:length(rgrid)
-    
     [fitresult, gof] = createFitSine(xgrid,x1,xlower+i*deltar,xupper+i*deltar);
-    g=struct2cell(gof);
-    if g{1}<tol
     coeffvals= coeffvalues(fitresult);
     k=coeffvals(2);
     lambda=(2*pi)/k; %meters
     lambdavec=[lambdavec; lambda];
-    lamdex=[lamdex; i*deltar];
-    end
+
 
 
 
@@ -116,6 +110,6 @@ end
 %points.
 %% plot
 figure;
-plot(lamdex*100,lambdavec*100) %(1:end-1)
+plot(rgrid*100,lambdavec*100) %(1:end-1)
 ylabel('Lambda (cm)')
 xlabel('r (cm)')
