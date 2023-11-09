@@ -24,7 +24,7 @@ ft = fittype( 'sin1' );
 excludedPoints = (xData < xstart) | (xData > xend);
 opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
 opts.Display = 'Off';
-opts.Lower = [-Inf 0 -Inf];
+opts.Lower = [-Inf 80 -Inf];
 opts.StartPoint = [0.260986226054489 50.7671430582814 0.532317294057775];
 opts.Exclude = excludedPoints;
 
