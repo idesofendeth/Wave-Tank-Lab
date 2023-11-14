@@ -45,7 +45,7 @@ thres = 25; %for marble with depth 6cm
 I2 = cell(1,height(I));
 for i = 1:height(I)
     %Remove background from images-----------------------------------------
-    I2{i} = imsubtract(I{i},Iavg) ;
+    I2{i} = I{i}-Iavg;%imsubtract(I{i},Iavg) ;
 
     %Adjust image contrast-------------------------------------------------
     I3{i} = imadjust(I2{i});
@@ -68,12 +68,13 @@ for i = 1:height(I)
 end
 
 %% curve fit test
-image=I3{125};
+image=I2{125};
 image=im2double(image);
 
 x1=image(467,686:end)';
 imax=max(x1);
 x1=x1/imax;
+x2=x1*imax;
 L=length(image(467,686:end));
 xgrid=0:1:L-1;
 xgrid=xgrid'*scale;
@@ -86,7 +87,9 @@ k=coeffvals(2);
 lambda=(2*pi)/k; %meters
 
 %ok cool, we now have a lambda for the first delta r. Lets make a loop
+res=length(unique(x1))
 
+resavg=length(unique(Iavg))
 %% loop time
 xlower=0.005;
 xupper=0.0075;
@@ -119,3 +122,14 @@ figure;
 plot(lamdex*100,lambdavec*100) %(1:end-1)
 ylabel('Lambda (cm)')
 xlabel('r (cm)')
+
+%% findpeaks test
+
+[peaks, locs]=findpeaks(x1,'MinPeakHeight',0.25);
+xlower=0.0075;
+xupper=0.01;
+deltar=abs(xlower-xupper);
+%ok this works
+
+
+
