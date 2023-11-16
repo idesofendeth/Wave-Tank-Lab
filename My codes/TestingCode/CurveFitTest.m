@@ -80,7 +80,7 @@ xgrid=0:1:L-1;
 xgrid=xgrid'*scale;
 xlower=0.005;
 xupper=0.01;
-[fitresult, gof] = createFitSine(xgrid,x1,xlower,xupper);
+[fitresult, gof] = createPoly2FitV2(xgrid,x1,peakPos,deltax)
 
 coeffvals= coeffvalues(fitresult);
 k=coeffvals(2);
@@ -125,11 +125,145 @@ xlabel('r (cm)')
 
 %% findpeaks test
 
-[peaks, locs]=findpeaks(x1,'MinPeakHeight',0.25);
+[peaks, locs]=findpeaks(x1,xgrid,'MinPeakHeight',0.25);
 xlower=0.0075;
 xupper=0.01;
 deltar=abs(xlower-xupper);
 %ok this works
 
+figure;
+plot(locs*scale,peaks,'*')
+xlim([0 160*scale])
+ylim([0 1])
+
+%% test of function poly2fitV2
+scalelocs=locs;%*scale;
+peakPos=scalelocs(5);
+deltax=3*scale; % is there a way to systematically identify x number of points? instead of a window, yes integer*scale.
+% scale is the delta x for each pixel. We get discrete points at each pixel
+% see below
+[fitresult, gof] = createPoly2FitV2(xgrid,x1,peakPos,deltax)
+
+%% loop poly2fitV2
+deltax=3*scale;
+fitPeakLoc=[];
+for j=1:length(locs)
+    peakPos=scalelocs(j);
+    [fitresult, gof] = createPoly2FitV2(xgrid,x1,peakPos,deltax)
+    coeffvals= coeffvalues(fitresult);
+    b=coeffvals(2);
+    fitPeakLoc=[fitPeakLoc b];
+
+end
+
+lambFit=diff(fitPeakLoc);
 
 
+%% plot test poly2fitV2
+
+% this looks promising
+
+figure;
+plot(fitPeakLoc(2:end)*100,lambFit*100,'*') %(1:end-1)
+ylabel('Lambda (cm)')
+xlabel('r (cm)')
+
+%% interp2 test DEREK THIS IS FOR YOU
+scale=3.004*10^-4; %scaling factor
+imagedata=load('C:\Users\ideso\OneDrive\Dokument\MATLAB\Project course\ProjectCourse\My codes\TestingCode\imageForDerek.mat').image;
+image=imagedata;
+X=(1:892)*scale;
+Y=X;
+V=image;
+Rmax=(892/2)*scale;
+Rmin=(220)*scale;
+R=linspace(Rmin,Rmax,1000);
+theta=0;
+Xq=R*cosd(theta)+(892/2)*scale;
+Yq=R*sind(theta)+(892/2)*scale;
+intervall=((892/2)+220:892)';
+%Xq=((892/2)+220:892)';
+%Yq=ones(length(Xq),1)*462;
+Vq = interp2(X,Y,V,Xq,Yq);
+% Vqmax=max(Vq);
+% VqNorm=Vq/imax;
+% [Vqpeaks Vqlocs]=findpeaks(VqNorm,Xq,'MinPeakHeight',0.25);
+
+figure;
+hold on
+plot(R,Vq)
+%plot(Vqlocs-((892/2-1)+220),Vqpeaks,'*')
+xpos=(892/2)+220:892;
+xpos1=(xpos-xpos(1)+220)*scale;
+plot(xpos1,image(467,intervall))
+legend('polyfit','raw')
+hold off
+
+
+
+
+
+
+
+
+
+%% image line rotate test chatgpt
+
+% Define image size
+imageSize = 892; % Adjust the size as needed
+
+% Create a blank image matrix
+imageMatrix = image;
+
+% Define center of the image
+center = imageSize / 2;
+
+% Define the length of the line
+lineLength = imageSize / 2;
+
+% Define angles for rotation (in degrees)
+angles = 0:1:360;
+
+% Initialize arrays to store x and y values
+xValues = zeros(size(angles));
+yValues = zeros(size(angles));
+
+% Create a figure to display the rotating line
+figure;
+
+for i = 1:length(angles)
+    % Convert angle to radians
+    angleRad = deg2rad(angles(i));
+    
+    % Calculate x and y coordinates of the line
+    x = center + lineLength * cos(angleRad);
+    y = center + lineLength * sin(angleRad);
+    
+    % Store x and y values in arrays
+    xValues(i) = x;
+    yValues(i) = y;
+    
+    % Plot the image matrix
+    imagesc(imageMatrix);
+    colormap(gray);
+    hold on;
+    
+    % Plot the rotating line
+    plot([center, x], [center, y], 'r', 'LineWidth', 2);
+    
+    % Set axis limits
+    axis([1, imageSize, 1, imageSize]);
+    
+    % Set aspect ratio to be equal
+    axis equal;
+    
+    % Pause to visualize the rotation
+    pause(0.01);
+    
+    % Clear the plot for the next iteration
+    clf;
+end
+
+% Display the x and y values on the line as it rotates
+disp('Angle   X Value   Y Value');
+disp([angles' xValues' yValues']);
