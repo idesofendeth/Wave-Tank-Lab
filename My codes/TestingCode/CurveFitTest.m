@@ -171,7 +171,8 @@ xlabel('r (cm)')
 %% interp2 test DEREK THIS IS FOR YOU
 %IMAGE CENTER IS 446, 892/2=446! MATH IS HARD SOMETIMES
 scale=3.004*10^-4; %scaling factor
-imagedata=load('C:\Users\Ides\OneDrive\Dokument\MATLAB\ProjectCourse\ProjectCourse\My codes\TestingCode\imageForDerek.mat').image;
+imagedata=load('C:\Users\ideso\OneDrive\Dokument\MATLAB\Project course\ProjectCourse\My codes\TestingCode\imageForDerek.mat').image;
+%imagedata=load('C:\Users\Ides\OneDrive\Dokument\MATLAB\ProjectCourse\ProjectCourse\My codes\TestingCode\imageForDerek.mat').image;
 centerIm=892/2;
 
 image=imagedata;
@@ -179,9 +180,9 @@ X=(1:892)*scale;
 Y=X;
 V=image;
 Rmax=(892/2)*scale;
-Rmin=(220)*scale;
+Rmin=(250)*scale;
 R=linspace(Rmin,Rmax,1000);
-theta=0;
+theta=-90;
 Xq=R*cosd(theta)+(892/2)*scale;
 Yq=R*sind(theta)+(892/2)*scale;
 intervall=((892/2)+220:892)';
@@ -205,7 +206,7 @@ hold off
 %normalize
 VqMax=max(Vq);
 VqNorm=Vq/VqMax;
-[Vqpeaks Vqlocs]=findpeaks(VqNorm,R,'MinPeakHeight',0.2);
+[Vqpeaks Vqlocs]=findpeaks(VqNorm,R,'MinPeakHeight',0.25);
 
 figure;
 hold on
@@ -213,6 +214,10 @@ plot(R,VqNorm,'--','LineWidth',2)
 plot(Vqlocs,Vqpeaks,'*')
 hold off
 % very good it works
+figure;
+plot(Xq,Yq)
+xlim([1*scale 892*scale])
+ylim([1*scale 892*scale])
 
 %% Turn peak location into x,y points
 
@@ -229,15 +234,17 @@ ylim([-(892/2)*scale (892/2)*scale])
 %% loop time find the circle peaks
 
 scale=3.004*10^-4; %scaling factor
-imagedata=load('C:\Users\Ides\OneDrive\Dokument\MATLAB\ProjectCourse\ProjectCourse\My codes\TestingCode\imageForDerek.mat').image;
+imagedata=load('C:\Users\ideso\OneDrive\Dokument\MATLAB\Project course\ProjectCourse\My codes\TestingCode\imageForDerek.mat').image;
+%load('C:\Users\Ides\OneDrive\Dokument\MATLAB\ProjectCourse\ProjectCourse\My codes\TestingCode\imageForDerek.mat').image; %desktop
 
 %initialize center and image data
 centerIm=892/2;
 image=imagedata;
 
 %x and y grid in image
-X=(1:892)*scale;
-Y=X;
+X=(-centerIm+1:centerIm)*scale;
+Y=[centerIm:-1:-centerIm+1]*scale;
+Y=Y+0.0105;
 V=image;
 
 %define a radius from the center, cut anything below 220 pixels (can be
@@ -252,7 +259,7 @@ R=linspace(Rmin,Rmax,1000);
 theta=0;
 
 %angle step
-dtheta=45/4;
+dtheta=90;
 
 % x and y peak location vectors, initialize with zeros as one does not know
 % a priori how many peaks the program will extract, this is a very basic
@@ -266,8 +273,8 @@ i=1;
 %feel free to change dtheta as one sees fit
 for theta=0:dtheta:360
     % x and y positions to be interpolated as function of R and theta
-    Xq=R*cosd(theta)+(892/2)*scale;
-    Yq=R*sind(theta)+(892/2)*scale;
+    Xq=R*cosd(theta);%+(892/2)*scale;
+    Yq=R*sind(theta);%(892/2)*scale;
    
    % interpolated values
     Vq = interp2(X,Y,V,Xq,Yq);
@@ -276,7 +283,7 @@ for theta=0:dtheta:360
     VqMax=max(Vq);
     VqNorm=Vq/VqMax;
     %Find Peaks
-    [Vqpeaks Vqlocs]=findpeaks(VqNorm,R,'MinPeakHeight',0.25);
+    [Vqpeaks Vqlocs]=findpeaks(VqNorm,R,'MinPeakHeight',0.15);
     % Extract x and y positions from the peak radial locations
     XPeakLoc=Vqlocs*cosd(theta);%+(892/2)*scale;
     YPeakLoc=Vqlocs*sind(theta); %+(892/2)*scale;
@@ -285,10 +292,23 @@ for theta=0:dtheta:360
     YPeakVec(i,1:length(YPeakLoc))=YPeakLoc;
     % index
     i=i+1;
+
+    % troubleshooting polyfit
+%     figure;
+%     hold on
+%     plot(Vqlocs,Vqpeaks,'*')
+%     plot(R,VqNorm,'LineWidth',2)
+%     hold off
 end
 %% plot results
 figure;
 plot(XPeakVec,YPeakVec,'*')
 xlim([-(892/2)*scale (892/2)*scale])
 ylim([-(892/2)*scale (892/2)*scale])
-
+%%
+figure(100),clf
+hold on
+contourf(X,Y,V,255,'linecolor','none')
+grid on
+plot(XPeakVec,YPeakVec,'*')
+plot(0,0,'+','MarkerSize',10)
