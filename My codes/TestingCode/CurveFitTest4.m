@@ -40,12 +40,12 @@ YPeakVec=zeros(360/dtheta,5);%[];
 %index for inserting peak data into vector
 i=1;
 %space threshold for filtering peaks too close to one another
-spaceThresh=0.005;
+spaceThresh=0.0025;
 % initialize variable for filtered peak locations and values
 VqPeaksFixed=[];
 VqlocsFixed=[];
 %feel free to change dtheta as one sees fit
-for theta=45-dtheta*2:dtheta:45-dtheta
+for theta=0%:dtheta:360
     % x and y positions to be interpolated as function of R and theta
     Xq=R*cosd(theta);%+(892/2)*scale;
     Yq=R*sind(theta);%(892/2)*scale;
@@ -58,7 +58,9 @@ for theta=45-dtheta*2:dtheta:45-dtheta
     VqNorm=Vq/VqMax;
     %Find Peaks
     [Vqpeaks Vqlocs]=findpeaks(VqNorm,R,'MinPeakHeight',0.15);
-    for k=2:length(Vqlocs)
+    %while index
+    k=2;
+    while k<=length(Vqlocs)
         %diff of location positions
         Vqlocdiff=Vqlocs(k)-Vqlocs(k-1);
         % windows of location positions and peak positions one is comparing
@@ -88,15 +90,16 @@ for theta=45-dtheta*2:dtheta:45-dtheta
             VqPeaksFixed=Vqpeaks;
 
         end
-        
+        Vqlocs=VqlocsFixed;
+        Vqpeaks=VqPeaksFixed;
 
-
+        k=k+1;
     end
 
 
     % Extract x and y positions from the peak radial locations
-    XPeakLoc=VqlocsFixed*cosd(theta);%+(892/2)*scale;
-    YPeakLoc=VqlocsFixed*sind(theta); %+(892/2)*scale;
+    XPeakLoc=VqlocsFixed*cosd(theta);
+    YPeakLoc=VqlocsFixed*sind(theta);
     % add values to x and y peak vectors
     XPeakVec(i,1:length(XPeakLoc))=XPeakLoc;
     YPeakVec(i,1:length(YPeakLoc))=YPeakLoc;
@@ -104,14 +107,14 @@ for theta=45-dtheta*2:dtheta:45-dtheta
     i=i+1;
 
     % troubleshooting polyfit plot
-    figure(102),clf;
+    figure(98),clf
     hold on
     plot(VqlocsFixed,VqPeaksFixed,'*')
     plot(R,VqNorm,'LineWidth',2)
     hold off
 end
 %% plot results
-figure;
+figure(99),clf
 plot(XPeakVec,YPeakVec,'*')
 xlim([-(892/2)*scale (892/2)*scale])
 ylim([-(892/2)*scale (892/2)*scale])
@@ -124,3 +127,26 @@ grid on
 plot(XPeakVec,YPeakVec,'*')
 plot(0,0,'+','MarkerSize',10)
 pbaspect([1 1 1])
+
+
+%% prominence test
+figure(101),clf
+findpeaks(VqNorm,R,'MinPeakHeight',0.15,'annotate','extents')
+[pks,locs,widths,proms]=findpeaks(VqNorm,R,'MinPeakHeight',0.15,'annotate','extents')
+
+
+%% fit using width from prominence using poly2fitv2
+
+[fitresult, gof] = createPoly2FitV2(R, VqNorm,VqlocsFixed(1),widths(1)/2)
+
+
+%% loop fit test
+
+for ii=1:length(VqlocsFixed)
+    [fitresult, gof] = createPoly2FitV2(R, VqNorm,VqlocsFixed(ii),widths(ii)/2)
+
+
+
+
+
+end
