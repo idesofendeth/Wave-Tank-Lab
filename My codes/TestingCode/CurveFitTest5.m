@@ -29,7 +29,7 @@ R=linspace(Rmin,Rmax,1000);
 theta=0;
 
 %angle step
-dtheta=45/4;
+dtheta=45/2;
 
 % x and y peak location vectors, initialize with zeros as one does not know
 % a priori how many peaks the program will extract, this is a very basic
@@ -47,12 +47,12 @@ VqlocsFixed=[];
 VqwidthsFixed=[];
 VqpromsFixed=[];
 %feel free to change dtheta as one sees fit
-for theta=90%:dtheta:360
+for theta=0:dtheta:360-dtheta
     % x and y positions to be interpolated as function of R and theta
     Xq=R*cosd(theta);%+(892/2)*scale;
     Yq=R*sind(theta);%(892/2)*scale;
-   
-   % interpolated values
+
+    % interpolated values
     Vq = interp2(X,Y,V,Xq,Yq);
 
     %Normalize
@@ -78,28 +78,46 @@ for theta=90%:dtheta:360
             %investigated points
             [VqPeakFilter I]=max(VqPeakWindow);
             %edge cases for start and end of vector
-            if k==2 
+            if k==2
                 VqlocsFixed=[VqLocWindow(I) Vqlocs(k+1:end)];
                 VqPeaksFixed=[VqPeakFilter Vqpeaks(k+1:end)];
+                VqwidthsFixed=[VqwidthsWindow(I) Vqwidths(k+1:end)];
+                VqpromsFixed=[VqpromsWindow(I) Vqproms(k+1:end)];
             elseif k==length(Vqlocs)
                 VqlocsFixed=[Vqlocs(1:k-2) VqLocWindow(I)];
                 VqPeaksFixed=[Vqpeaks(1:k-2) VqPeakFilter];
+                VqwidthsFixed=[Vqwidths(1:k-2) VqwidthsWindow(I)];
+                VqpromsFixed=[Vqproms(1:k-2) VqpromsWindow(I)];
             else %otherwise do this
                 VqlocsFixed=[Vqlocs(1:k-2) VqLocWindow(I) Vqlocs(k+1:end)];
                 VqPeaksFixed=[Vqpeaks(1:k-2) VqPeakFilter Vqpeaks(k+1:end)];
+                VqwidthsFixed=[Vqwidths(1:k-2) VqwidthsWindow(I) Vqwidths(k+1:end)];
+                VqpromsFixed=[Vqproms(1:k-2) VqpromsWindow(I) Vqproms(k+1:end)];
 
             end
         else
             VqlocsFixed=Vqlocs;
             VqPeaksFixed=Vqpeaks;
+            VqwidthsFixed=Vqwidths;
+            VqpromsFixed=Vqproms;
+
 
         end
         Vqlocs=VqlocsFixed;
         Vqpeaks=VqPeaksFixed;
+        Vqwidths=VqwidthsFixed;
+        Vqproms=VqpromsFixed
 
         k=k+1;
     end
+    PolyPeakLocs=[];
+    for ii=1:length(VqlocsFixed)
+        [fitresult, gof] = createPoly2FitV2(R, VqNorm,VqlocsFixed(ii),VqwidthsFixed(ii)/2)
 
+        PolyPeakLocs=[PolyPeakLocs fitresult.b];
+
+    end
+    VqlocsFixed=PolyPeakLocs;
 
     % Extract x and y positions from the peak radial locations
     XPeakLoc=VqlocsFixed*cosd(theta);
@@ -111,11 +129,11 @@ for theta=90%:dtheta:360
     i=i+1;
 
     % troubleshooting polyfit plot
-    figure(98),clf
-    hold on
-    plot(VqlocsFixed,VqPeaksFixed,'*')
-    plot(R,VqNorm,'LineWidth',2)
-    hold off
+%     figure(98),clf
+%     hold on
+%     plot(VqlocsFixed,VqPeaksFixed,'*')
+%     plot(R,VqNorm,'LineWidth',2)
+%     hold off
 end
 %% plot results
 figure(99),clf
@@ -124,13 +142,51 @@ xlim([-(892/2)*scale (892/2)*scale])
 ylim([-(892/2)*scale (892/2)*scale])
 pbaspect([1 1 1])
 %%
-figure(100),clf
+figure(1000),clf
 hold on
 contourf(X,Y,V,255,'linecolor','none')
 grid on
 plot(XPeakVec,YPeakVec,'*')
 plot(0,0,'+','MarkerSize',10)
 pbaspect([1 1 1])
+
+%% circle testing circlefit 1991
+xCentVec=[];
+yCentVec=[];
+radiusVec=[];
+for l=1:size(XPeakVec,2)
+[xCenter, yCenter, radiusFit, a] = circlefit(XPeakVec(:,l), YPeakVec(:,l))
+xCentVec=[xCentVec; xCenter];
+yCentVec=[yCentVec; yCenter];
+radiusVec=[radiusVec; radiusFit];
+
+end
+
+%% circle testing own code
+% number of index steps until one reaches 180 from current circle position
+addi=180/dtheta;
+
+% make circle diameters
+
+tophalfx=XPeakVec(1:addi,:);
+tophalfy=YPeakVec(1:addi,:);
+bothalfx=XPeakVec(1+addi:end,:);
+bothalfy=YPeakVec(1+addi:end,:);
+
+xDia=abs(tophalfx-bothalfx);
+yDia=abs(tophalfy-bothalfy);
+xRad=xDia/2;
+yRad=yDia/2;
+xCent=[tophalfx(1:1+addi/2,:)-xRad(1:1+addi/2,:);tophalfx(2+addi/2:end,:)+xRad(2+addi/2:end,:)];
+yCent=[tophalfy(1:1+addi/2,:)-yRad(1:1+addi/2,:);tophalfy(2+addi/2:end,:)-yRad(2+addi/2:end,:)];
+
+xCent=[xCent;bothalfx(1:1+addi/2,:)+xRad(1:1+addi/2,:);bothalfx(2+addi/2:end,:)-xRad(2+addi/2:end,:)];
+yCent=[yCent;bothalfy(1:1+addi/2,:)+yRad(1:1+addi/2,:);bothalfy(2+addi/2:end,:)+yRad(2+addi/2:end,:)];
+diameter=sqrt(xDia.^2 + yDia.^2);
+radius=diameter/2;
+
+meanXCent=mean(xCent,1);
+meanYcent=mean(yCent,1);
 
 
 %% prominence test
@@ -145,9 +201,12 @@ findpeaks(VqNorm,R,'MinPeakHeight',0.15,'annotate','extents')
 
 
 %% loop fit test
-
+PolyPeakLocs=[];
 for ii=1:length(VqlocsFixed)
-    [fitresult, gof] = createPoly2FitV2(R, VqNorm,VqlocsFixed(ii),widths(ii)/2)
+    [fitresult, gof] = createPoly2FitV2(R, VqNorm,VqlocsFixed(ii),VqwidthsFixed(ii)/2)
+
+    PolyPeakLocs=[PolyPeakLocs fitresult.b];
 
 end
+
 

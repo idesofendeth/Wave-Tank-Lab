@@ -32,15 +32,15 @@ opts.Exclude = excludedPoints;
 [fitresult, gof] = fit( xData, yData, ft, opts );
 
 % Plot fit with data.
-figure( 'Name', 'untitled fit 1' );
-h = plot( fitresult, xData, yData, excludedPoints );
-legend( h, 'x1 vs. xgrid', 'Excluded x1 vs. xgrid', 'untitled fit 1', 'Location', 'NorthEast', 'Interpreter', 'none' );
-% Label axes
-xlabel( 'xgrid', 'Interpreter', 'none' );
-ylabel( 'x1', 'Interpreter', 'none' );
-ylim([0 1])
-xlim([0 xgrid(end)])
-grid on
+% figure( 'Name', 'untitled fit 1' );
+% h = plot( fitresult, xData, yData, excludedPoints );
+% legend( h, 'x1 vs. xgrid', 'Excluded x1 vs. xgrid', 'untitled fit 1', 'Location', 'NorthEast', 'Interpreter', 'none' );
+% % Label axes
+% xlabel( 'xgrid', 'Interpreter', 'none' );
+% ylabel( 'x1', 'Interpreter', 'none' );
+% ylim([0 1])
+% xlim([0 xgrid(end)])
+% grid on
 
 peakPos
 peakPos-deltax
