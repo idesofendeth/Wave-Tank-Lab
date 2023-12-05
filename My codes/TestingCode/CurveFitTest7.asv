@@ -146,7 +146,7 @@ figure(100),clf
 hold on
 contourf(X,Y,V,255,'linecolor','none')
 grid on
-plot(XPeakVec,YPeakVec,'*','MarkerSize',10)
+plot(XPeakVec,YPeakVec,'*')
 plot(0,0,'+','MarkerSize',10)
 pbaspect([1 1 1])
 
@@ -158,7 +158,7 @@ for l=1:size(XPeakVec,2)
     [xCenter, yCenter, radiusFit, a] = circlefit(XPeakVec(:,l), YPeakVec(:,l))
     xCentVec=[xCentVec; xCenter];
     yCentVec=[yCentVec; yCenter];
-    if l<size(XPeakVec,2)
+    if radiusFit>=radiusVec
         radiusVec=[radiusVec; radiusFit];
     end
 end
@@ -308,13 +308,11 @@ xCentVec=[];
 yCentVec=[];
 radiusVec=[];
 for l=1:size(XPeakVec,2)
-    zcheck=numel(find(~XPeakVec(:,l)));
-    if zcheck<=2
     [xCenter, yCenter, radiusFit, a] = circlefit(XPeakVec(:,l), YPeakVec(:,l))
     xCentVec=[xCentVec; xCenter];
     yCentVec=[yCentVec; yCenter];
     radiusVec=[radiusVec; radiusFit];
-    end
+
 end
 meanYCent=mean(yCentVec);
 meanXCent=mean(xCentVec);
@@ -323,7 +321,7 @@ figure(1000),clf
 hold on
 contourf(X,Y,V,255,'linecolor','none')
 grid on
-plot(XPeakVec,YPeakVec,'*','MarkerSize',10)
+plot(XPeakVec,YPeakVec,'*')
 plot(0,0,'+','MarkerSize',10)
 pbaspect([1 1 1])
 circcenters=zeros(length(radiusVec),2);
