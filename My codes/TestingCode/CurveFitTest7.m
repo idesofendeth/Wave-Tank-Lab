@@ -6,20 +6,22 @@ close all
 scale=3.004*10^-4; %scaling factor
 imagedata=load('C:\Users\ideso\OneDrive\Dokument\MATLAB\Project course\ProjectCourse\My codes\TestingCode\imageForDerek.mat').image;
 %load('C:\Users\Ides\OneDrive\Dokument\MATLAB\ProjectCourse\ProjectCourse\My codes\TestingCode\imageForDerek.mat').image; %desktop
-
+YOff=-0.0105;
+XOff=0;
 %initialize center and image data
-centerIm=892/2;
+centerIm=size(imagedata,1)/2;
 image=imagedata;
 
 %x and y grid in image
 X=(-centerIm+1:centerIm)*scale;
 Y=[centerIm:-1:-centerIm+1]*scale;
-Y=Y+0.0105; %offset found by experimentation, this is a decent center of image
+Y=Y-YOff; %offset found by experimentation, this is a decent center of image
+X=X-XOff;
 V=image;
 
 %define a radius from the center, cut anything below 220 pixels (can be
 %changed
-Rmax=(892/2)*scale;
+Rmax=(centerIm)*scale;
 Rmin=(250)*scale;
 
 % define the interpolation line
@@ -112,7 +114,7 @@ for theta=0:dtheta:360-dtheta
     end
     PolyPeakLocs=[];
     for ii=1:length(VqlocsFixed)
-        [fitresult, gof] = createPoly2FitV2(R, VqNorm,VqlocsFixed(ii),VqwidthsFixed(ii)/2)
+        [fitresult, gof] = createPoly2FitV3(R, VqNorm,VqlocsFixed(ii),VqwidthsFixed(ii)/2)
 
         PolyPeakLocs=[PolyPeakLocs fitresult.b];
 
@@ -280,7 +282,7 @@ for theta=0:dtheta:360-dtheta
     end
     PolyPeakLocs=[];
     for ii=1:length(VqlocsFixed)
-        [fitresult, gof] = createPoly2FitV2(R, VqNorm,VqlocsFixed(ii),VqwidthsFixed(ii)/2)
+        [fitresult, gof] = createPoly2FitV3(R, VqNorm,VqlocsFixed(ii),VqwidthsFixed(ii)/2)
 
         PolyPeakLocs=[PolyPeakLocs fitresult.b];
 

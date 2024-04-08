@@ -1,25 +1,76 @@
 %% loop time find the circle peaks
 clear all
 close all
+%% testing ideas many parts of this starting code are taking from Albins main code file.
+I = load( sprintf('Images_Marble_%dcm.mat',6) ).I;
+%I = load( sprintf('Images_MarbleADJUSTED_%dcm.mat',10) ).I;
+%I = load( sprintf('Images_Droplet_%dcm.mat',6) ).I;
 
+
+% Create an averaged image-------------------------------------------------
+% NOTES: MAYBE MAKE A IF STATEMENT HERE SUCH THAT ONE CHOOSES AN IMAGE
+% SERIES NUMBER (eg 6, 10 ect) and the avg and thres are chosen
+% automatically
+
+% furthermore, the following work quite well and give good results when
+% matching the correct average and thresholding for the given dataset.
+% Which is awesome!
+%Iavg = AverageImageFunc(I(1:15)); %works for marble 10cm, this works in this code aswell
+Iavg = AverageImageFunc(I(:));%works for marble depth 1cm, 6cm. Also works for 1cm droplet!
+%Iavg = AverageImageFunc(I(185:200));%works for marble depth 1cm, 6cm
+%Iavg=AverageImageFunc(I(45:end));
+%Threshold level for binarizing--------------------------------------------
+%thres = 18; %for droplet with depth 6cm
+%thres = 23; %for marble with depth 1cm
+thres = 25; %for marble with depth 6cm
+
+
+%Remove background, adjust contrast, threshold, edge-detection-------------
+I2 = cell(1,height(I));
+for i = 1:height(I)
+    %Remove background from images-----------------------------------------
+    I2{i} = I{i}-Iavg;%imsubtract(I{i},Iavg) ;
+
+    %Adjust image contrast-------------------------------------------------
+    I3{i} = imadjust(I2{i});
+
+    %Filter image----------------------------------------------------------
+   % I3{i} = imdiffusefilt(I3{i});
+
+    % % %Threshold image-------------------------------------------------------
+    % I3{i} = I3{i} > thres;
+    % 
+    % %Clean up image--------------------------------------------------------
+    % I3{i} = bwareaopen(I3{i},50) ;
+    % I3{i} = imclearborder(I3{i});
+    %edgesmoothing
+    % windowSize = 51;
+    % kernel = ones(windowSize) / windowSize ^ 2;
+    % blurryImage = conv2(single(I3{i}), kernel, 'same');
+    % I3{i} = blurryImage > thres; % Rethreshold
+
+end
 %%
 scale=3.004*10^-4; %scaling factor
 imagedata=load('C:\Users\ideso\OneDrive\Dokument\MATLAB\Project course\ProjectCourse\My codes\TestingCode\imageForDerek.mat').image;
 %load('C:\Users\Ides\OneDrive\Dokument\MATLAB\ProjectCourse\ProjectCourse\My codes\TestingCode\imageForDerek.mat').image; %desktop
-
+YOff=-0.0105;
+XOff=0;
 %initialize center and image data
-centerIm=892/2;
-image=imagedata;
+centerIm=size(imagedata,1)/2;
+image=I2{125};%imagedata;
+image=im2double(image);
 
 %x and y grid in image
 X=(-centerIm+1:centerIm)*scale;
 Y=[centerIm:-1:-centerIm+1]*scale;
-Y=Y+0.0105; %offset found by experimentation, this is a decent center of image
+Y=Y-YOff; %offset found by experimentation, this is a decent center of image
+X=X-XOff;
 V=image;
 
 %define a radius from the center, cut anything below 220 pixels (can be
 %changed
-Rmax=(892/2)*scale;
+Rmax=(centerIm)*scale;
 Rmin=(250)*scale;
 
 % define the interpolation line
@@ -112,7 +163,7 @@ for theta=0:dtheta:360-dtheta
     end
     PolyPeakLocs=[];
     for ii=1:length(VqlocsFixed)
-        [fitresult, gof] = createPoly2FitV2(R, VqNorm,VqlocsFixed(ii),VqwidthsFixed(ii)/2)
+        [fitresult, gof] = createPoly2FitV3(R, VqNorm,VqlocsFixed(ii),VqwidthsFixed(ii)/2)
 
         PolyPeakLocs=[PolyPeakLocs fitresult.b];
 
@@ -146,7 +197,7 @@ figure(100),clf
 hold on
 contourf(X,Y,V,255,'linecolor','none')
 grid on
-plot(XPeakVec,YPeakVec,'*')
+plot(XPeakVec,YPeakVec,'*','MarkerSize',10)
 plot(0,0,'+','MarkerSize',10)
 pbaspect([1 1 1])
 
@@ -158,7 +209,7 @@ for l=1:size(XPeakVec,2)
     [xCenter, yCenter, radiusFit, a] = circlefit(XPeakVec(:,l), YPeakVec(:,l))
     xCentVec=[xCentVec; xCenter];
     yCentVec=[yCentVec; yCenter];
-    if radiusFit>=radiusVec
+    if l<size(XPeakVec,2)
         radiusVec=[radiusVec; radiusFit];
     end
 end
@@ -280,7 +331,7 @@ for theta=0:dtheta:360-dtheta
     end
     PolyPeakLocs=[];
     for ii=1:length(VqlocsFixed)
-        [fitresult, gof] = createPoly2FitV2(R, VqNorm,VqlocsFixed(ii),VqwidthsFixed(ii)/2)
+        [fitresult, gof] = createPoly2FitV3(R, VqNorm,VqlocsFixed(ii),VqwidthsFixed(ii)/2)
 
         PolyPeakLocs=[PolyPeakLocs fitresult.b];
 
@@ -308,11 +359,13 @@ xCentVec=[];
 yCentVec=[];
 radiusVec=[];
 for l=1:size(XPeakVec,2)
+    zcheck=numel(find(~XPeakVec(:,l)));
+    if zcheck<=2
     [xCenter, yCenter, radiusFit, a] = circlefit(XPeakVec(:,l), YPeakVec(:,l))
     xCentVec=[xCentVec; xCenter];
     yCentVec=[yCentVec; yCenter];
     radiusVec=[radiusVec; radiusFit];
-
+    end
 end
 meanYCent=mean(yCentVec);
 meanXCent=mean(xCentVec);
@@ -321,7 +374,7 @@ figure(1000),clf
 hold on
 contourf(X,Y,V,255,'linecolor','none')
 grid on
-plot(XPeakVec,YPeakVec,'*')
+plot(XPeakVec,YPeakVec,'*','MarkerSize',10)
 plot(0,0,'+','MarkerSize',10)
 pbaspect([1 1 1])
 circcenters=zeros(length(radiusVec),2);

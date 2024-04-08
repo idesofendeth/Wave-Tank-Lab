@@ -1,4 +1,4 @@
-function [fitresult, gof] = createPoly2FitV2(xgrid, x1,peakPos,deltax)
+function [fitresult, gof] = createPoly2FitV3(xgrid, x1,peakPos,deltax)
 %CREATEFIT(XGRID,X1)
 %  Create a fit.
 %
@@ -27,24 +27,35 @@ opts.Lower = [-9*10^5 0 -Inf];
 opts.StartPoint = [0.743132468124916 peakPos 1];
 opts.Upper = [0 Inf Inf];
 opts.Exclude = excludedPoints;
-
-% Fit model to data.
-
-if length(xData)<3
-    
-    ft = fittype( 'a*(x-b)^2+c', 'independent', 'x', 'dependent', 'y' );
-    excludedPoints = (xData < peakPos-2*deltax) | (xData > peakPos+2*deltax);
-    opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
-    opts.Display = 'Off';
+includedPoints = (xData > peakPos-deltax) & (xData < peakPos+deltax);
+widedex=2;
+while nnz(~excludedPoints)<3
+    excludedPoints = (xData < peakPos-deltax*widedex) | (xData > peakPos+deltax*widedex);
+    includedPoints = (xData > peakPos-deltax*widedex) & (xData < peakPos+deltax*widedex);
+    opts = fitoptions( 'Method', 'NonLinearLeastSquares' );
+   opts.Display = 'Off';
     opts.Lower = [-9*10^5 0 -Inf];
     opts.StartPoint = [0.743132468124916 peakPos 1];
     opts.Upper = [0 Inf Inf];
     opts.Exclude = excludedPoints;
-    [fitresult, gof] = fit( xData, yData, ft, opts );
-else
-    [fitresult, gof] = fit( xData, yData, ft, opts );
+    widedex=widedex+1;
 end
-
+% Fit model to data.
+% if nnz(~excludedPoints)<3
+%     ft = fittype( 'a*(x-b)^2+c', 'independent', 'x', 'dependent', 'y' );
+%     excludedPoints = (xData < peakPos-2*deltax) | (xData > peakPos+2*deltax);
+%     includedPoints = (xData > peakPos-2*deltax) | (xData < peakPos+2*deltax);
+%     opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
+%     opts.Display = 'Off';
+%     opts.Lower = [-9*10^5 0 -Inf];
+%     opts.StartPoint = [0.743132468124916 peakPos 1];
+%     opts.Upper = [0 Inf Inf];
+%     opts.Exclude = excludedPoints;
+%     [fitresult, gof] = fit( xData, yData, ft, opts );
+% else
+%     [fitresult, gof] = fit( xData, yData, ft, opts );
+% end
+    [fitresult, gof] = fit( xData, yData, ft, opts );
 
 % Plot fit with data.
 % figure( 'Name', 'untitled fit 1' );
@@ -57,8 +68,8 @@ end
 % xlim([0 xgrid(end)])
 % grid on
 
-peakPos
-peakPos-deltax
-peakPos+deltax
+peakPos;
+peakPos-deltax;
+peakPos+deltax;
 
 
