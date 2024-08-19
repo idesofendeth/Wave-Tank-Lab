@@ -105,7 +105,7 @@ end
 
 
 %% fitting circles to data
-[Centers,Radius,Radiuskmeans, RadiusDerek] = circleFitterV2(XPeakVec,YPeakVec,scale,centerIm)
+[Centers,Radius,Radiuskmeans, RadiusDerek] = circleFitterV2(XPeakVec,YPeakVec,scale,centerIm);
 
 %% visualization
 figure(100),clf
@@ -130,8 +130,8 @@ imagesc(X,Y,V./max(V)) %,255,'linecolor','none')
 colorbar
 colormap('bone')
 grid on
-plot(XPeakVec,YPeakVec,'*','MarkerSize',10)
-plot(0,0,'+','MarkerSize',10)
+plot(XPeakVec,YPeakVec,'*','MarkerSize',10,'LineWidth', 2)
+plot(0,0,'+','MarkerSize',10,'LineWidth', 2)
 pbaspect([1 1 1])
 xlim([-centerIm*scale centerIm*scale])
 ylim([-centerIm*scale centerIm*scale])
@@ -146,8 +146,8 @@ imagesc(X,Y,V./max(V)) %,255,'linecolor','none')
 colorbar
 colormap('bone')
 grid on
-plot(XPeakVec,YPeakVec,'*','MarkerSize',10)
-plot(0,0,'+','MarkerSize',10)
+plot(XPeakVec,YPeakVec,'*','MarkerSize',10,'LineWidth', 2)
+plot(0,0,'+','MarkerSize',10,'LineWidth', 2)
 pbaspect([1 1 1])
 xlim([-centerIm*scale centerIm*scale])
 ylim([-centerIm*scale centerIm*scale])

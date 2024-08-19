@@ -1,7 +1,8 @@
 function [XPeakLoc,YPeakLoc] = VqSort(Vqpeaks, Vqlocs, Vqwidths, Vqproms,VqNorm,theta, spaceThresh,R)
 %VqSort Organizes and finds the locations of the peaks in the data.
 % input: output from findpeaks
-% output: fixed version of locations of peaks
+% output: fixed version of locations of peaks, getting rid of any "double
+% peaks" or where two peaks are reported for the same crest.
 
 %index initialization
 k=2;
@@ -19,7 +20,7 @@ while k<=length(Vqlocs)
     VqpromsWindow=[Vqproms(k-1) Vqproms(k)];
     % filtering out locations of peaks that are too close to eachother
     % taking the largest peak to save, throwing away the other
-    % there is some bug here, some of the points arent disappearing..
+    
     if abs(Vqlocdiff)<spaceThresh
         %finding the value and index of the maximum between the
         %investigated points
@@ -74,6 +75,12 @@ PolyPeakLocs=[];
 % plot(R,VqNorm,'LineWidth',2)
 % plot(VqlocsFixed,VqPeaksFixed,'*')
 
+%This loop fits a polynomial function to the datapoints around the reported
+%peak. This is due to the fact that some crests are "flat topped" due to
+%the binning of the pixels from what I understand. The real crest position
+%should be somewhere on the flat top region and using a polynomial one can
+%interpolate where this location might be from the datapoints on the slop
+%of the wave crest.
 for ii=1:length(Vqlocs) %PREVIOUSLY VqlocsFixed, change if this fucks up, same with widths
     [fitresult, gof] = createPoly2FitV3(R, VqNorm,Vqlocs(ii),abs(Vqwidths(ii))/2);
 
@@ -95,9 +102,11 @@ a=length(R(1:end))
 plot(VqlocsFixed,VqPeaksFixed,'*')
 plot(R,VqNorm,'LineWidth',2)
 xlim([0.05 0.15])
+xlabel('Position')
+ylabel('Normalized Brightness')
 %plot(R,VqNorm,'g--','LineWidth',2)
 hold off
-% %pause
+ %pause
 
 %end of for loop
 end

@@ -3,7 +3,11 @@ function [Centers,Radius,Radiuskmeans,radiusSortDerek] = circleFitterV2(XPeakVec
 % input: XPeakVec and YPeakVec from previous
 % function. These are then cleaned up and
 % non-physical points are removed
-% output: Centers  and Radius: x and y center positions with radii for each reported circle
+% output: Centers  and Radius: x and y center positions with radii for each
+% reported circle, Kmeans and Derek Threshold Solution are two sorting
+% methods that sort the data for each circle into their own vectors.
+% Previous implementation could not discern between datapoints for
+% different circles.
 xCentVec=[];
 yCentVec=[];
 radiusVec=[];

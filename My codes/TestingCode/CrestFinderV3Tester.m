@@ -122,7 +122,7 @@ thetaStep=45/5;
 for imdex=137
     image=I2{imdex};
     image=im2double(image);
-    [XPeakVec,YPeakVec,Centers,Radius,Radiuskmeans,RadiusDerek] = CrestFinderV5(image,scale,X,Y,Rmini,thetaStep);
+    [XPeakVec,YPeakVec,Centers,Radius,Radiuskmeans,RadiusDerek] = CrestFinderV5(image,scale,X,Y,Rmini,thetaStep)
     %contourf(X,Y,image,256,'LineColor','none')
     V=image;
     figure(95), clf
@@ -177,7 +177,7 @@ V=image;
     imagesc(X,flip(Y),V./max(V)) %,255,'linecolor','none')
 colorbar
 colormap('bone')
-%%
+%% phase speeds
 dt=1/300;
 lambvec1=diff(RadiusDerek1)*100;
 lambvec2=diff(RadiusDerek2)*100;
