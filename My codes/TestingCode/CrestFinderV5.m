@@ -114,7 +114,7 @@ imagesc(X,Y,V./max(V)) %,255,'linecolor','none')
 colorbar
 colormap('bone')
 grid on
-plot(XPeakVec,YPeakVec,'*','MarkerSize',10)
+plot(XPeakVec,YPeakVec,'*','MarkerSize',10, 'LineWidth', 2)
 plot(0,0,'+','MarkerSize',10)
 pbaspect([1 1 1])
 xlim([-centerIm*scale centerIm*scale])

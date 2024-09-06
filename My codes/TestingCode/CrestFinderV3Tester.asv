@@ -147,7 +147,7 @@ V=image;
 Rmini=200;
 echo off;
 thetaStep=45/5;
-for imdex=154
+for imdex=110
     image=I2{imdex};
     image=im2double(image);
     [XPeakVec,YPeakVec,Centers,Radius1,Radiuskmeans1,RadiusDerek1] = CrestFinderV5(image,scale,X,Y,Rmini,thetaStep);
@@ -162,7 +162,7 @@ V=image;
 colorbar
 colormap('bone')
 
-for imdex=155
+for imdex=111
     image=I2{imdex};
     image=im2double(image);
     [XPeakVec,YPeakVec,Centers,Radius2,Radiuskmeans2,RadiusDerek2] = CrestFinderV5(image,scale,X,Y,Rmini,thetaStep);
@@ -211,8 +211,8 @@ figure;
 
 plot(lambda*100,c*100,lambda*100,c_cap*100,'-.',lambda*100,c_grav*100,'-.','LineWidth',1.5)
 hold on
-plot(lambvec2(1:length(cphasederek)),cphasederek(1:length(lambvec2(1:length(cphasederek)))),'*','LineWidth',1.5)
-%plot(lambvec1(1:length(cphasekmeans)),cphasekmeans(1:length(lambvec1(1:length(cphasekmeans)))),'x','LineWidth',1.5)
+plot(lambvec1(1:length(cphasederek)),cphasederek(1:length(lambvec1(1:length(cphasederek)))),'*','LineWidth',1.5)
+plot(lambvec1(1:length(cphasekmeans)),cphasekmeans(1:length(lambvec1)),'x','LineWidth',1.5)
 %plot(lamdavec,phasevec(:,2:end),'*') %lamda will always have 1 less column, thus one must cut some data from phase vec.
 %this might be losing some data, but it works for the most part 
 hold off
