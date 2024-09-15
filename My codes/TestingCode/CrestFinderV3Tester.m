@@ -141,102 +141,129 @@ end
 
 
 %% lambda testing
-V=image;
-%Vq = interp2(X,Y,V,Xq,Yq);
-%Rmini=150;
-Rmini=200;
-echo off;
-thetaStep=45/5;
-for imdex=154
-    image=I2{imdex};
-    image=im2double(image);
-    [XPeakVec,YPeakVec,Centers,Radius1,Radiuskmeans1,RadiusDerek1] = CrestFinderV5(image,scale,X,Y,Rmini,thetaStep);
+
+
+ %% Dispersion relation plot
+ istart=100;
+iend=140;
+    fig=figure(150);
+    g = 9.82;
+    %lambda = linspace(0,0.15);
+    lambda = linspace(0,0.35,10000);
+    rho = 997;
+    sigma = 0.07275;
+    H = linspace(1,1,length(lambda));
+
+    mainaxes=axes(fig);
+    hold(mainaxes,"on") 
+    %Dispersion relation
+    c = sqrt( ( g* lambda /(2* pi) + 2*pi*sigma./ (rho *lambda) ) .*tanh( 2*pi* H./lambda ) );
+    disp('The limiting cases')
+    %pure capillary wave
+    c_cap = sqrt( (  2*pi*sigma./ (rho *lambda) ) .*tanh( 2*pi* H./lambda ) );
+    %Pure gravity wave
+    c_grav = sqrt( ( g* lambda /(2* pi) ) .*tanh( 2*pi* H./lambda ) );
+   
+    % plot(lambda,c,lambda,c_cap,'-.',lambda,c_grav,'-.','LineWidth',1)
+
+    plot(lambda*100,c*100,lambda*100,c_cap*100,'-.',lambda*100,c_grav*100,'-.','LineWidth',1.5)
+for i=istart:iend-1
+    V=image;
+    %Vq = interp2(X,Y,V,Xq,Yq);
+    %Rmini=150;
+    Rmini=200;
+    echo off;
+    thetaStep=45/5;
+     imdex=i
+        image=I2{imdex};
+        image=im2double(image);
+        [XPeakVec,YPeakVec,Centers,Radius1,Radiuskmeans1,RadiusDerek1] = CrestFinderV5(image,scale,X,Y,Rmini,thetaStep);
+
+        %Radius
+        %pause
+
     
-    %Radius 
-    %pause
- 
-end
-V=image;
- figure(95), clf
+    V=image;
+    figure(95), clf
     imagesc(X,flip(Y),V./max(V)) %,255,'linecolor','none')
-colorbar
-colormap('bone')
+    colorbar
+    colormap('bone')
+    title('image #'+string(imdex))
 
-for imdex=155
-    image=I2{imdex};
-    image=im2double(image);
-    [XPeakVec,YPeakVec,Centers,Radius2,Radiuskmeans2,RadiusDerek2] = CrestFinderV5(image,scale,X,Y,Rmini,thetaStep);
+     imdex=i+1
+        image=I2{imdex};
+        image=im2double(image);
+        [XPeakVec,YPeakVec,Centers,Radius2,Radiuskmeans2,RadiusDerek2] = CrestFinderV5(image,scale,X,Y,Rmini,thetaStep);
+
+        %Radius
+        %pause
+
     
-    %Radius 
-    %pause
- 
+    V=image;
+
+%     figure(96), clf
+%     imagesc(X,flip(Y),V./max(V)) %,255,'linecolor','none')
+%     colorbar
+%     colormap('bone')
+    %% phase speeds
+    dt=1/300;
+    lambvec1=diff(RadiusDerek1)*100;
+    lambvec2=diff(RadiusDerek2)*100;
+    %lambavg=(lambvec1+lambvec2)/2;
+    cderek=phaseSpeedCalc(RadiusDerek1,RadiusDerek2,dt);
+    cphasederek=cderek*100;
+    cphasederek=cphasederek(cphasederek>0);
+    ckmeans=phaseSpeedCalc(Radiuskmeans1,Radiuskmeans2,dt);
+    cphasekmeans=ckmeans*100;
+    cphasekmeans=cphasekmeans(cphasekmeans>0);
+
+    hold on
+    % making vectors equal for plotting for kmeans solution
+    cphasekmeans=rmoutliers(cphasekmeans);
+    desired_length=min(numel(cphasekmeans),numel(lambvec1));
+    lambvec1=lambvec1(1:desired_length);
+    cphasekmeans=cphasekmeans(1:desired_length);
+    %plot(mainaxes,lambvec1,cphasekmeans,'x','LineWidth',1.5)
+    % making vectors equal for plotting for dereks solution
+     cphasederek=rmoutliers(cphasederek);
+    desired_length=min(numel(cphasederek),numel(lambvec1));
+    lambvec1=lambvec1(1:desired_length);
+    cphasederek=cphasederek(1:desired_length);
+    plot(mainaxes,lambvec1,cphasederek,'.','LineWidth',1.5)
+    
+
+   
+    
+
+   
+    
+    %plot(lamdavec,phasevec(:,2:end),'*') %lamda will always have 1 less column, thus one must cut some data from phase vec.
+    %this might be losing some data, but it works for the most part
+    
+
+
+
+    ylabel(mainaxes,'$c$ [cm/s]','Interpreter','latex')
+    xlabel(mainaxes,'$\lambda$ [cm]','Interpreter','latex')
+
+    legend(mainaxes,'$c$','$c_{capillary}$','$c_{gravity}$','Derek Crest','Kmeans Crest','Interpreter','latex')
+    title(mainaxes,'Dispersion relation: Theory vs captured data')
+    ylim(mainaxes,[0 100])
+    xlim(mainaxes,[0 6])
+    % disp('Shallow water approx, kH<<1, leads to tanh(kH)~kH')
+    % disp('Deep water approx, kH>>1, leads to tanh(kH)~1')
+    % %Deep water surface waves ( kH>>1 )
+    % c_cap_deep = sqrt( (2* pi* sigma)./ (rho*lambda)); %Pure capillary wave  (dispersive)
+    % c_grav_deep = sqrt( (g* lambda)./ (2*pi) ); %Pure gravity wave (dispersive)
+    % %Shallow water surface waves ( kH<<1 )
+    % c_cap_shallow = 2* pi./lambda .*sqrt( sigma.*H/ rho); %Pure capillary wave (dispersive)
+    % c_grav_shallow = sqrt(g* H); % Pure gravity wave (non dispersive)
+    lambda_min = 2*pi*sqrt(sigma/(rho*g))*10^2;
+    lambda_cap = sqrt(sigma/(rho*g))*10^2;
+    %2*pi*sqrt(lambda_)
+
+
+    set(mainaxes,'fontsize',15)
+
 end
-V=image;
-
- figure(96), clf
-    imagesc(X,flip(Y),V./max(V)) %,255,'linecolor','none')
-colorbar
-colormap('bone')
-%% phase speeds
-dt=1/300;
-lambvec1=diff(RadiusDerek1)*100;
-lambvec2=diff(RadiusDerek2)*100;
-%lambavg=(lambvec1+lambvec2)/2;
-cderek=phaseSpeedCalc(RadiusDerek1,RadiusDerek2,dt);
-cphasederek=cderek*100;
-cphasederek=cphasederek(cphasederek>0);
-ckmeans=phaseSpeedCalc(Radiuskmeans1,Radiuskmeans2,dt);
-cphasekmeans=ckmeans*100;
-cphasekmeans=cphasekmeans(cphasekmeans>0);
-%% Dispersion relation plot
-g = 9.82;
-lambda = linspace(0,0.15);
-lambda = linspace(0,0.35,10000);
-rho = 997;
-sigma = 0.07275;
-H = linspace(1,1,length(lambda));
-
-
-%Dispersion relation
-c = sqrt( ( g* lambda /(2* pi) + 2*pi*sigma./ (rho *lambda) ) .*tanh( 2*pi* H./lambda ) );
-disp('The limiting cases')
-%pure capillary wave
-c_cap = sqrt( (  2*pi*sigma./ (rho *lambda) ) .*tanh( 2*pi* H./lambda ) );
-%Pure gravity wave
-c_grav = sqrt( ( g* lambda /(2* pi) ) .*tanh( 2*pi* H./lambda ) );
-%Plots
-
-figure;
-% plot(lambda,c,lambda,c_cap,'-.',lambda,c_grav,'-.','LineWidth',1)
-
-plot(lambda*100,c*100,lambda*100,c_cap*100,'-.',lambda*100,c_grav*100,'-.','LineWidth',1.5)
-hold on
-plot(lambvec2(1:length(cphasederek)),cphasederek(1:length(lambvec2(1:length(cphasederek)))),'*','LineWidth',1.5)
-%plot(lambvec1(1:length(cphasekmeans)),cphasekmeans(1:length(lambvec1(1:length(cphasekmeans)))),'x','LineWidth',1.5)
-%plot(lamdavec,phasevec(:,2:end),'*') %lamda will always have 1 less column, thus one must cut some data from phase vec.
-%this might be losing some data, but it works for the most part 
 hold off
-
-
-
-ylabel('$c$ [cm/s]','Interpreter','latex')
-xlabel('$\lambda$ [cm]','Interpreter','latex')
-
-legend('$c$','$c_{capillary}$','$c_{gravity}$','Derek Crest','Kmeans Crest','Interpreter','latex')
-title('Dispersion relation: Theory vs captured data')
-ylim([0 100])
-xlim([0 6])
-% disp('Shallow water approx, kH<<1, leads to tanh(kH)~kH')
-% disp('Deep water approx, kH>>1, leads to tanh(kH)~1')
-% %Deep water surface waves ( kH>>1 )
-% c_cap_deep = sqrt( (2* pi* sigma)./ (rho*lambda)); %Pure capillary wave  (dispersive)
-% c_grav_deep = sqrt( (g* lambda)./ (2*pi) ); %Pure gravity wave (dispersive)
-% %Shallow water surface waves ( kH<<1 )
-% c_cap_shallow = 2* pi./lambda .*sqrt( sigma.*H/ rho); %Pure capillary wave (dispersive)
-% c_grav_shallow = sqrt(g* H); % Pure gravity wave (non dispersive)
-lambda_min = 2*pi*sqrt(sigma/(rho*g))*10^2;
-lambda_cap = sqrt(sigma/(rho*g))*10^2;
-%2*pi*sqrt(lambda_)
-
-
-set(gca,'fontsize',15)

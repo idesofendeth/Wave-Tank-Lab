@@ -96,17 +96,17 @@ YPeakLoc=VqlocsFixed*sind(theta);
 
 
 %troubleshooting polyfit plot
-figure(98),clf
-hold on
-a=length(R(1:end))
-plot(VqlocsFixed,VqPeaksFixed,'*')
-plot(R,VqNorm,'LineWidth',2)
-xlim([0.05 0.15])
-xlabel('Position')
-ylabel('Normalized Brightness')
-%plot(R,VqNorm,'g--','LineWidth',2)
-hold off
- %pause
+% figure(98),clf
+% hold on
+% a=length(R(1:end))
+% plot(VqlocsFixed,VqPeaksFixed,'*')
+% plot(R,VqNorm,'LineWidth',2)
+% xlim([0.05 0.15])
+% xlabel('Position')
+% ylabel('Normalized Brightness')
+% %plot(R,VqNorm,'g--','LineWidth',2)
+% hold off
+%  %pause
 
 %end of for loop
 end
