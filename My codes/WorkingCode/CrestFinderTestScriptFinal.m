@@ -1,5 +1,11 @@
 clear all
 close all
+
+%% IMPORTANT:
+% You need the following toolboxes from MATLAB:
+%Curve fitting toolbox
+%Image processing toolbox
+%Computer vision toolbox
 %% testing ideas many parts of this starting code are taking from Albins main code file.
 I = load( sprintf('Images_Marble_%dcm.mat',6) ).I;
 %I = load( sprintf('Images_MarbleADJUSTED_%dcm.mat',10) ).I;
