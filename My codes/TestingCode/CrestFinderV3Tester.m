@@ -145,7 +145,7 @@ end
 
  %% Dispersion relation plot
  istart=100;
-iend=140;
+ iend=210;
     fig=figure(150);
     g = 9.82;
     %lambda = linspace(0,0.15);
@@ -229,7 +229,7 @@ for i=istart:iend-1
     desired_length=min(numel(cphasederek),numel(lambvec1));
     lambvec1=lambvec1(1:desired_length);
     cphasederek=cphasederek(1:desired_length);
-    plot(mainaxes,lambvec1,cphasederek,'.','LineWidth',1.5)
+    plot(mainaxes,lambvec1,cphasederek,'.','LineWidth',1.5,'MarkerSize',10)
     
 
    
@@ -246,7 +246,7 @@ for i=istart:iend-1
     ylabel(mainaxes,'$c$ [cm/s]','Interpreter','latex')
     xlabel(mainaxes,'$\lambda$ [cm]','Interpreter','latex')
 
-    legend(mainaxes,'$c$','$c_{capillary}$','$c_{gravity}$','Derek Crest','Kmeans Crest','Interpreter','latex')
+    legend(mainaxes,'$c$','$c_{capillary}$','$c_{gravity}$','Data','Interpreter','latex')
     title(mainaxes,'Dispersion relation: Theory vs captured data')
     ylim(mainaxes,[0 100])
     xlim(mainaxes,[0 6])

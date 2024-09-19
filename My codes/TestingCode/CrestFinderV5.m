@@ -124,36 +124,36 @@ end
 % title('Previous Implementation')
 % 
 % 
-% figure(1000),clf
-% hold on
-% imagesc(X,Y,V./max(V)) %,255,'linecolor','none')
-% colorbar
-% colormap('bone')
-% grid on
-% plot(XPeakVec,YPeakVec,'*','MarkerSize',10,'LineWidth', 2)
-% plot(0,0,'+','MarkerSize',10,'LineWidth', 2)
-% pbaspect([1 1 1])
-% xlim([-centerIm*scale centerIm*scale])
-% ylim([-centerIm*scale centerIm*scale])
-% circcenters=zeros(length(Radiuskmeans),2);
-% viscircles(circcenters,Radiuskmeans,'LineWidth',1)
-% title('Kmeans Solution')
-% 
-% 
-% figure(1001),clf
-% hold on
-% imagesc(X,Y,V./max(V)) %,255,'linecolor','none')
-% colorbar
-% colormap('bone')
-% grid on
-% plot(XPeakVec,YPeakVec,'*','MarkerSize',10,'LineWidth', 2)
-% plot(0,0,'+','MarkerSize',10,'LineWidth', 2)
-% pbaspect([1 1 1])
-% xlim([-centerIm*scale centerIm*scale])
-% ylim([-centerIm*scale centerIm*scale])
-% circcenters=zeros(length(RadiusDerek),2);
-% viscircles(circcenters,RadiusDerek,'LineWidth',1)
-% title('Derek Threshold Solution')
+figure(1000),clf
+hold on
+imagesc(X,Y,V./max(V)) %,255,'linecolor','none')
+colorbar
+colormap('bone')
+grid on
+plot(XPeakVec,YPeakVec,'*','MarkerSize',10,'LineWidth', 2)
+plot(0,0,'+','MarkerSize',10,'LineWidth', 2)
+pbaspect([1 1 1])
+xlim([-centerIm*scale centerIm*scale])
+ylim([-centerIm*scale centerIm*scale])
+circcenters=zeros(length(Radiuskmeans),2);
+viscircles(circcenters,Radiuskmeans,'LineWidth',1)
+title('Kmeans Solution')
+
+
+figure(1001),clf
+hold on
+imagesc(X,Y,V./max(V)) %,255,'linecolor','none')
+colorbar
+colormap('bone')
+grid on
+plot(XPeakVec,YPeakVec,'*','MarkerSize',10,'LineWidth', 2)
+plot(0,0,'+','MarkerSize',10,'LineWidth', 2)
+pbaspect([1 1 1])
+xlim([-centerIm*scale centerIm*scale])
+ylim([-centerIm*scale centerIm*scale])
+circcenters=zeros(length(RadiusDerek),2);
+viscircles(circcenters,RadiusDerek,'LineWidth',1)
+title('Derek Threshold Solution')
 
 
 %end of function
